@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: net.consensys.cava:cava-devp2p:0.6.0@jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-devp2p/0.6.0/6de5e67fe707a4c4e9ee499e7d635a686885b647/cava-devp2p-0.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-devp2p/0.6.0/56a987e2597268c321eb71119fa22574a83833d7/cava-devp2p-0.6.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

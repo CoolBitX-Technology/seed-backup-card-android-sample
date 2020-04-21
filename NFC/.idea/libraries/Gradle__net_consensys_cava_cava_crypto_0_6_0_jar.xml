@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: net.consensys.cava:cava-crypto:0.6.0@jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-crypto/0.6.0/405eb3d6bf509e6a50bd200a37dfcf434dea9f47/cava-crypto-0.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-crypto/0.6.0/90a8633375661556ad992a272bead123040b16b4/cava-crypto-0.6.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

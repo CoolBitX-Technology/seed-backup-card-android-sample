@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: net.consensys.cava:cava-net-coroutines:0.6.0@jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-net-coroutines/0.6.0/89734b8255ee69fec0e2d903a74f443611f66dd8/cava-net-coroutines-0.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-net-coroutines/0.6.0/4e2ef8f8e8fd82df4513123de6716537f5d79a69/cava-net-coroutines-0.6.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

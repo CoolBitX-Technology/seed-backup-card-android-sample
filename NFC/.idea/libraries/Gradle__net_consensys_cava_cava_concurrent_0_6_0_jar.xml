@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: net.consensys.cava:cava-concurrent:0.6.0@jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-concurrent/0.6.0/1a1e1fda5bc0847b91b19ec3e2a96eee5e85c3d4/cava-concurrent-0.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-concurrent/0.6.0/3bd09e4da24ce83e9c828e481a446b48cf4d3cfd/cava-concurrent-0.6.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
