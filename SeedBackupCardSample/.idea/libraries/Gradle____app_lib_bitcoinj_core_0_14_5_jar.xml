@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: ./app/lib/bitcoinj-core-0.14.5.jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/lib/bitcoinj-core-0.14.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

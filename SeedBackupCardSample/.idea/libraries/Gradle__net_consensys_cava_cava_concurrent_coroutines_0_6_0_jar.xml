@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: net.consensys.cava:cava-concurrent-coroutines:0.6.0@jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-concurrent-coroutines/0.6.0/68d217d762c56788a40cd13b96e9a6e9ab4bddac/cava-concurrent-coroutines-0.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-concurrent-coroutines/0.6.0/57baafd8f75750d2d5ef0d653dc572bc0a14b0cd/cava-concurrent-coroutines-0.6.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-concurrent-coroutines/0.6.0/77ce32d6d65588d0b2e7fa6430243e58e0813589/cava-concurrent-coroutines-0.6.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

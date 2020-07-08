@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: net.consensys.cava:cava-kv:0.6.0@jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-kv/0.6.0/ccd26970d6d3ae6c4f388a6d28009161ff1244bb/cava-kv-0.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-kv/0.6.0/239a1375359aeb7e7646c4903a9b53de238a1f16/cava-kv-0.6.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.consensys.cava/cava-kv/0.6.0/be3339fa3648a73bbd371f9d9bcf60c39881dd6a/cava-kv-0.6.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
