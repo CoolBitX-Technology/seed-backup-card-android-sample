@@ -32,11 +32,11 @@ public class CWSUtil {
         String SECURE_CHANNEL = "80CE000041";
     }
 
-    private interface ErrorCode {
+    public interface ErrorCode {
         String SUCCESS = "9000";
         String RESET_FIRST = "6330";
         String NO_DATA = "6370";
-        String PING_CODE_NOT_MATCH = "6350";
+        String PIN_CODE_NOT_MATCH = "6350";
         String CARD_IS_LOCKED = "6390";
     }
 
@@ -193,8 +193,8 @@ public class CWSUtil {
                     tmp = ErrorCode.NO_DATA;
                     break;
                 }
-                case ErrorCode.PING_CODE_NOT_MATCH: {
-                    tmp = ErrorCode.PING_CODE_NOT_MATCH;
+                case ErrorCode.PIN_CODE_NOT_MATCH: {
+                    tmp = ErrorCode.PIN_CODE_NOT_MATCH;
                     break;
                 }
                 case ErrorCode.CARD_IS_LOCKED: {

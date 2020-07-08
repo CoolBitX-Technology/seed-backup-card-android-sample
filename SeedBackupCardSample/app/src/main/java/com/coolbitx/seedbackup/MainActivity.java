@@ -9,21 +9,21 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.coolbitx.seedbackup.databinding.ActivityMainBinding;
 import com.coolbitx.seedbackup.utils.CWSUtil;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private TextView txtResult;
-    private EditText mEtBackupData;
-    private EditText mEtPinCode;
+    private ActivityMainBinding binding;
 
     private NfcAdapter mNfcAdapter;
     private Tag mTag;
@@ -32,38 +32,57 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         initViews();
         initNFC();
     }
 
-    private void initViews() {
-        mEtBackupData = findViewById(R.id.edit_backup_msg);
-        mEtPinCode = findViewById(R.id.edit_pin);
-        Button mBtnBackup = findViewById(R.id.btn_backup);
-        Button mBtnRestore = findViewById(R.id.btn_restore);
-        Button mBtReset = findViewById(R.id.btn_reset);
-        txtResult = findViewById(R.id.txtResult);
 
-        mBtnBackup.setOnClickListener(view -> {
+    private void initViews() {
+
+        binding.btnBackup.setOnClickListener(view -> {
             if (mTag != null) {
-                String msg = CWSUtil.backup(mEtBackupData.getText().toString(), mEtPinCode.getText().toString(), mTag);
-                showResult(msg);
-            }
-        });
-        mBtnRestore.setOnClickListener(view -> {
-            if (mTag != null) {
-                String msg = CWSUtil.restore(mEtPinCode.getText().toString(), mTag);
-                showResult(msg);
-            }
-        });
-        mBtReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mTag != null) {
-                    String msg = CWSUtil.reset(mTag);
-                    showResult(msg);
+                if (TextUtils.isEmpty(binding.editBackup.getText())) {
+                    binding.textInputBackup.setError(getString(R.string.cant_be_blank));
+                    binding.textInputBackup.setErrorEnabled(true);
+                    return;
                 }
+                if (TextUtils.isEmpty(binding.editPin.getText())) {
+                    binding.textInputPin.setError(getString(R.string.cant_be_blank));
+                    binding.textInputPin.setErrorEnabled(true);
+                    return;
+                }
+
+                binding.textInputBackup.setErrorEnabled(false);
+                binding.textInputPin.setErrorEnabled(false);
+                String msg = CWSUtil.backup(
+                        binding.editBackup.getText().toString(),
+                        binding.editPin.getText().toString(),
+                        mTag);
+                showResult(msg);
+            }
+        });
+        binding.btnRestore.setOnClickListener(view -> {
+            if (mTag != null) {
+                if (TextUtils.isEmpty(binding.editPin.getText())) {
+                    binding.textInputPin.setError(getString(R.string.cant_be_blank));
+                    binding.textInputPin.setErrorEnabled(true);
+                    return;
+                }
+                binding.textInputPin.setErrorEnabled(false);
+                String msg = CWSUtil.restore(binding.editPin.getText().toString(), mTag);
+                showResult(msg);
+            }
+        });
+        binding.btnReset.setOnClickListener(view -> {
+            binding.textInputBackup.setErrorEnabled(false);
+            binding.textInputPin.setErrorEnabled(false);
+            if (mTag != null) {
+                String msg = CWSUtil.reset(mTag);
+                showResult(msg);
             }
         });
     }
@@ -102,6 +121,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showResult(String msg) {
-        txtResult.setText(msg);
+        String result;
+        if (msg == null) return;
+        switch (msg) {
+            case CWSUtil.ErrorCode.SUCCESS:
+                result = "Success";
+                break;
+            case CWSUtil.ErrorCode.RESET_FIRST:
+                result = "You need to reset first";
+                break;
+            case CWSUtil.ErrorCode.NO_DATA:
+                result = "There's no data";
+                break;
+            case CWSUtil.ErrorCode.PIN_CODE_NOT_MATCH:
+                result = "Your PIN doesn't match";
+                break;
+            case CWSUtil.ErrorCode.CARD_IS_LOCKED:
+                result = "The card is locked.";
+                break;
+            default:
+                result = msg;
+        }
+        binding.tvResult.setText(result);
     }
 }

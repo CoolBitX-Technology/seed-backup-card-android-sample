@@ -7,4 +7,7 @@
     <string name="result">Result</string>
     <string name="pin">PIN</string>
     <string name="backup_msg">Backup Message</string>
+    <string name="dummy_backup_msg">Hello world!</string>
+    <string name="dummy_pin">0000</string>
+    <string name="cant_be_blank">This field can\'t be blank</string>
 </resources>

@@ -27,6 +27,9 @@ android {
     packagingOptions {
         pickFirst 'META-INF/*'
     }
+    buildFeatures {
+        viewBinding true
+    }
 
 }
 //apply plugin: "com.google.osdetector"
