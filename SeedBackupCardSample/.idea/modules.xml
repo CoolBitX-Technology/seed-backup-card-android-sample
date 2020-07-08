@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/NFC.iml" filepath="$PROJECT_DIR$/NFC.iml" group="NFC" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/SeedBackupCardSample.iml" filepath="$PROJECT_DIR$/.idea/modules/SeedBackupCardSample.iml" group="SeedBackupCardSample" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SeedBackupCardSample-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SeedBackupCardSample-app.iml" group="SeedBackupCardSample/app" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="NFC/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="SeedBackupCardSample/app" />
     </modules>
   </component>
 </project>
