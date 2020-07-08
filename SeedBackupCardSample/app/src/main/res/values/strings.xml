@@ -4,4 +4,7 @@
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
     <string name="reset">Reset</string>
+    <string name="result">Result</string>
+    <string name="pin">PIN</string>
+    <string name="backup_msg">Backup Message</string>
 </resources>

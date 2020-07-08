@@ -6,7 +6,9 @@ import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        mEtPinCode = findViewById(R.id.pinCodeTxt);
-        mEtBackupData = findViewById(R.id.backupTxt);
+        mEtBackupData = findViewById(R.id.edit_backup_msg);
+        mEtPinCode = findViewById(R.id.edit_pin);
         Button mBtnBackup = findViewById(R.id.btn_backup);
         Button mBtnRestore = findViewById(R.id.btn_restore);
         Button mBtReset = findViewById(R.id.btn_reset);
@@ -89,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
         mTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         Log.d(TAG, "onNewIntent: " + intent.getAction());
 

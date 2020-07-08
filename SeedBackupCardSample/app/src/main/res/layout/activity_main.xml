@@ -1,77 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/activity_vertical_margin"
     tools:context="com.coolbitx.seedbackup.MainActivity">
 
     <TextView
-        android:id="@+id/backup"
+        android:id="@+id/tv_label_backup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="backup :" />
+        android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/activity_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:text="@string/backup_msg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/backupTxt"
-        android:layout_width="match_parent"
+        android:id="@+id/edit_backup_msg"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/backup"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:autofillHints="no"
         android:hint="@string/backup"
-        android:text="0987654321" />
+        android:inputType="text"
+        android:text="0987654321"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_label_backup" />
 
     <TextView
-        android:id="@+id/pinCode"
-        android:layout_width="match_parent"
+        android:id="@+id/tv_label_pin"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="pinCode :" />
+        android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/activity_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:text="@string/pin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edit_backup_msg" />
 
     <EditText
-        android:id="@+id/pinCodeTxt"
+        android:id="@+id/edit_pin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/backup"
-        android:layout_marginTop="100dp"
-        android:hint="@string/backup"
-        android:text="123456789" />
+        android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:autofillHints="no"
+        android:inputType="numberPassword"
+        android:text="123456789"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_label_pin" />
 
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_backup"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/backup"
-        android:layout_marginTop="150dp"
-        android:text="@string/backup" />
+        android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/activity_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:text="@string/backup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edit_pin" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_restore"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/backup"
-        android:layout_marginTop="210dp"
-        android:text="@string/restore" />
+        android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/view_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:text="@string/restore"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_backup" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_reset"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/backup"
-        android:layout_marginTop="270dp"
-        android:text="@string/reset" />
+        android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/view_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:text="@string/reset"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_restore" />
 
     <TextView
         android:id="@+id/txtResult"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_reset"
-        android:layout_marginTop="10dp"
-        android:text="result :" />
-</RelativeLayout>
+        android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/view_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:text="@string/result"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_reset" />
+</androidx.constraintlayout.widget.ConstraintLayout>
