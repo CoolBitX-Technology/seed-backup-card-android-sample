@@ -109,6 +109,10 @@ public class CWSUtil {
         return sendCmdWithSecureChannel(Commands.RESET, "", tag);
     }
 
+    public static void getTriesRemaining(Tag tag) {
+
+    }
+
     private static String sendCmdWithSecureChannel(String apduHeader, String cmd, Tag tag) {
 
         try {

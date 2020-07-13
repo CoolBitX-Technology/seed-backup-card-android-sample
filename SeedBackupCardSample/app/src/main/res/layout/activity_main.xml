@@ -57,7 +57,8 @@
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_input_pin" />
+        app:layout_constraintTop_toBottomOf="@id/text_input_pin"
+        tools:text="error" />
 
 
     <com.google.android.material.button.MaterialButton
@@ -101,6 +102,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:rippleColor="#FFCCD5" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
