@@ -6,15 +6,10 @@ import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.coolbitx.seedbackup.databinding.ActivityMainBinding;
 import com.coolbitx.seedbackup.utils.CWSUtil;
@@ -27,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     private NfcAdapter mNfcAdapter;
     private Tag mTag;
-
     private Mode currentMode;
+
     private enum Mode {
         BACKUP,
         RESTORE,
@@ -53,23 +48,38 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnCheck.setOnClickListener(view -> {
             currentMode = Mode.CHECK_CARD;
-            // Check if the card is locked with default pin
-            String msg = CWSUtil.restore("0000", mTag);
-            String result = "";
-            if (!TextUtils.isEmpty(msg)) {
-                switch (msg) {
-                    case CWSUtil.ErrorCode.CARD_IS_LOCKED:
-                        result = "The card is locked.";
-                        break;
-                    case CWSUtil.ErrorCode.NO_DATA:
-                        result = "The card is empty.";
-                        break;
-                    default:
-                        result = "The card is not empty.";
 
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (this) {
+                        // Check if the card is locked with default pin
+                        final String msg = CWSUtil.restore("0000", mTag);
+
+                        binding.tvResult.post(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                String result = "";
+                                if (!TextUtils.isEmpty(msg)) {
+                                    switch (msg) {
+                                        case CWSUtil.ErrorCode.CARD_IS_LOCKED:
+                                            result = "The card is locked.";
+                                            break;
+                                        case CWSUtil.ErrorCode.NO_DATA:
+                                            result = "The card is empty.";
+                                            break;
+                                        default:
+                                            result = "The card is not empty.";
+                                    }
+                                }
+                                binding.tvResult.setText(result);
+                            }
+                        });
+                    }
                 }
-            }
-            binding.tvResult.setText(result);
+            }).start();
         });
 
         binding.btnBackup.setOnClickListener(view -> {
@@ -88,13 +98,21 @@ public class MainActivity extends AppCompatActivity {
 
                 binding.textInputBackup.setErrorEnabled(false);
                 binding.textInputPin.setErrorEnabled(false);
-                String msg = CWSUtil.backup(
-                        binding.editBackup.getText().toString(),
-                        binding.editPin.getText().toString(),
-                        mTag);
-                showResult(msg);
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String msg = CWSUtil.backup(
+                                binding.editBackup.getText().toString(),
+                                binding.editPin.getText().toString(),
+                                mTag);
+
+                        runOnUiThread(() -> showResult(msg));
+                    }
+                }).start();
             }
         });
+
         binding.btnRestore.setOnClickListener(view -> {
             currentMode = Mode.RESTORE;
             if (mTag != null) {
@@ -104,17 +122,31 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 binding.textInputPin.setErrorEnabled(false);
-                String msg = CWSUtil.restore(binding.editPin.getText().toString(), mTag);
-                showResult(msg);
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String msg = CWSUtil.restore(binding.editPin.getText().toString(), mTag);
+
+                        runOnUiThread(() -> showResult(msg));
+                    }
+                }).start();
             }
         });
+
         binding.btnReset.setOnClickListener(view -> {
             currentMode = Mode.RESET;
             binding.textInputBackup.setErrorEnabled(false);
             binding.textInputPin.setErrorEnabled(false);
             if (mTag != null) {
-                String msg = CWSUtil.reset(mTag);
-                showResult(msg);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String msg = CWSUtil.reset(mTag);
+
+                        runOnUiThread(() -> showResult(msg));
+                    }
+                }).start();
             }
         });
     }
@@ -129,8 +161,9 @@ public class MainActivity extends AppCompatActivity {
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        if (mNfcAdapter != null)
+        if (mNfcAdapter != null) {
             mNfcAdapter.enableForegroundDispatch(this, pendingIntent, nfcIntentFilter, null);
+        }
     }
 
     @Override
@@ -144,8 +177,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         mTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        Log.d(TAG, "onNewIntent: " + intent.getAction());
+        Log.d(TAG, "onNewIntent: " + intent.getAction() + ", tag: " + mTag.toString());
 
+//        if (mNfcAdapter != null && mTag != null) {
+//            mNfcAdapter.ignore(mTag, 1000, new NfcAdapter.OnTagRemovedListener() {
+//                @Override
+//                public void onTagRemoved() {
+//                    Toast.makeText(MainActivity.this, "card is disconnected", Toast.LENGTH_SHORT).show();
+//                }
+//            }, new Handler(Looper.getMainLooper()));
+//        }
     }
 
     private void initNFC() {
