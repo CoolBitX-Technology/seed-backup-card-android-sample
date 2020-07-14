@@ -28,6 +28,14 @@ public class MainActivity extends AppCompatActivity {
     private NfcAdapter mNfcAdapter;
     private Tag mTag;
 
+    private Mode currentMode;
+    private enum Mode {
+        BACKUP,
+        RESTORE,
+        RESET,
+        CHECK_CARD,
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +51,29 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews() {
 
+        binding.btnCheck.setOnClickListener(view -> {
+            currentMode = Mode.CHECK_CARD;
+            // Check if the card is locked with default pin
+            String msg = CWSUtil.restore("0000", mTag);
+            String result = "";
+            if (!TextUtils.isEmpty(msg)) {
+                switch (msg) {
+                    case CWSUtil.ErrorCode.CARD_IS_LOCKED:
+                        result = "The card is locked.";
+                        break;
+                    case CWSUtil.ErrorCode.NO_DATA:
+                        result = "The card is empty.";
+                        break;
+                    default:
+                        result = "The card is not empty.";
+
+                }
+            }
+            binding.tvResult.setText(result);
+        });
+
         binding.btnBackup.setOnClickListener(view -> {
+            currentMode = Mode.BACKUP;
             if (mTag != null) {
                 if (TextUtils.isEmpty(binding.editBackup.getText())) {
                     binding.textInputBackup.setError(getString(R.string.cant_be_blank));
@@ -66,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         binding.btnRestore.setOnClickListener(view -> {
+            currentMode = Mode.RESTORE;
             if (mTag != null) {
                 if (TextUtils.isEmpty(binding.editPin.getText())) {
                     binding.textInputPin.setError(getString(R.string.cant_be_blank));
@@ -78,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         binding.btnReset.setOnClickListener(view -> {
+            currentMode = Mode.RESET;
             binding.textInputBackup.setErrorEnabled(false);
             binding.textInputPin.setErrorEnabled(false);
             if (mTag != null) {
@@ -121,27 +153,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showResult(String msg) {
-        String result;
+        StringBuilder result = new StringBuilder();
         if (msg == null) return;
         switch (msg) {
             case CWSUtil.ErrorCode.SUCCESS:
-                result = "Success";
+                if (currentMode == Mode.BACKUP) {
+                    result.append("Backup");
+                } else if (currentMode == Mode.RESTORE) {
+                    result.append("Restore");
+                } else if (currentMode == Mode.RESET) {
+                    result.append("Reset");
+                }
+                result.append(" succeeded!");
                 break;
             case CWSUtil.ErrorCode.RESET_FIRST:
-                result = "You need to reset first";
+                result.append("You need to reset first.");
                 break;
             case CWSUtil.ErrorCode.NO_DATA:
-                result = "There's no data";
+                result.append("The card is empty.");
                 break;
             case CWSUtil.ErrorCode.PIN_CODE_NOT_MATCH:
-                result = "Your PIN doesn't match";
+                result.append("Your PIN doesn't match.");
                 break;
             case CWSUtil.ErrorCode.CARD_IS_LOCKED:
-                result = "The card is locked.";
+                result.append("The card is locked.");
                 break;
             default:
-                result = msg;
+                result.append(msg);
         }
-        binding.tvResult.setText(result);
+        binding.tvResult.setText(result.toString());
     }
 }

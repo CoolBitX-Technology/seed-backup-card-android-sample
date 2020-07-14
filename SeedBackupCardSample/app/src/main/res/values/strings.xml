@@ -1,13 +1,21 @@
 <resources>
-    <string name="app_name">CoolWallet SeedBackup</string>
+    <string name="app_name">Seed Backup Card</string>
+    <string name="app_name_abbr">SBC</string>
 
+    <!-- button label -->
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
+    <string name="check_card">Check Card</string>
     <string name="reset">Reset</string>
-    <string name="result">Result</string>
+
+    <!-- input field label -->
     <string name="pin">PIN</string>
     <string name="backup_msg">Backup Message</string>
-    <string name="dummy_backup_msg">Hello world!</string>
+
+    <!-- input field placeholder -->
+    <string name="dummy_backup_msg">Hello World!</string>
     <string name="dummy_pin">0000</string>
+
+    <!-- input field error message -->
     <string name="cant_be_blank">This field can\'t be blank</string>
 </resources>

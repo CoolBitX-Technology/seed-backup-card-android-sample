@@ -50,15 +50,26 @@
     <TextView
         android:id="@+id/tv_result"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/activity_margin"
-        android:layout_marginTop="@dimen/activity_margin"
-        android:layout_marginEnd="@dimen/activity_margin"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/activity_margin"
+        android:layout_marginHorizontal="@dimen/activity_margin"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline3"
+        app:layout_constraintBottom_toTopOf="@id/btn_check"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_input_pin"
         tools:text="error" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_check"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/activity_margin"
+        android:padding="@dimen/button_padding"
+        android:text="@string/check_card"
+        app:layout_constraintBottom_toTopOf="@id/btn_backup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <com.google.android.material.button.MaterialButton
@@ -68,7 +79,7 @@
         android:layout_marginStart="@dimen/activity_margin"
         android:layout_marginTop="@dimen/activity_margin"
         android:layout_marginEnd="@dimen/view_margin"
-        android:padding="12dp"
+        android:padding="@dimen/button_padding"
         android:text="@string/backup"
         app:layout_constraintBottom_toTopOf="@id/btn_reset"
         app:layout_constraintEnd_toStartOf="@id/btn_restore"
@@ -81,7 +92,7 @@
         android:layout_marginStart="@dimen/view_margin"
         android:layout_marginTop="@dimen/activity_margin"
         android:layout_marginEnd="@dimen/activity_margin"
-        android:padding="12dp"
+        android:padding="@dimen/button_padding"
         android:text="@string/restore"
         app:layout_constraintBottom_toTopOf="@id/btn_reset"
         app:layout_constraintEnd_toEndOf="parent"
@@ -92,10 +103,9 @@
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/activity_margin"
-        android:layout_marginEnd="@dimen/activity_margin"
+        android:layout_marginHorizontal="@dimen/activity_margin"
         android:layout_marginBottom="@dimen/activity_margin"
-        android:padding="12dp"
+        android:padding="@dimen/button_padding"
         android:text="@string/reset"
         android:textColor="@color/colorRed"
         app:layout_constraintBottom_toBottomOf="parent"
