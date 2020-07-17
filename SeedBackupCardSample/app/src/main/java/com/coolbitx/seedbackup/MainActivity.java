@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
+import android.nfc.tech.IsoDep;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     private NfcAdapter mNfcAdapter;
+    private IntentFilter[] intentFilters;
+    private PendingIntent pendingIntent;
     private Tag mTag;
     private Mode currentMode;
 
@@ -28,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         BACKUP,
         RESTORE,
         RESET,
-        CHECK_CARD,
+        CHECK,
     }
 
 
@@ -39,45 +42,54 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        initViews();
+        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         initNFC();
+        initViews();
     }
 
 
     private void initViews() {
 
         binding.btnCheck.setOnClickListener(view -> {
-            currentMode = Mode.CHECK_CARD;
+            currentMode = Mode.CHECK;
 
 
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    synchronized (this) {
+//                        // Check if the card is locked with default pin
+//                        final String msg = CWSUtil.restore("0000", mTag);
+//
+//                        binding.tvResult.post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//
+//                                String result = "";
+//                                if (!TextUtils.isEmpty(msg)) {
+//                                    switch (msg) {
+//                                        case CWSUtil.ErrorCode.CARD_IS_LOCKED:
+//                                            result = "The card is locked.";
+//                                            break;
+//                                        case CWSUtil.ErrorCode.NO_DATA:
+//                                            result = "The card is empty.";
+//                                            break;
+//                                        default:
+//                                            result = "The card is not empty.";
+//                                    }
+//                                }
+//                                binding.tvResult.setText(result);
+//                            }
+//                        });
+//                    }
+//                }
+//            }).start();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    synchronized (this) {
-                        // Check if the card is locked with default pin
-                        final String msg = CWSUtil.restore("0000", mTag);
+                    final String msg = CWSUtil.check(mTag);
 
-                        binding.tvResult.post(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                String result = "";
-                                if (!TextUtils.isEmpty(msg)) {
-                                    switch (msg) {
-                                        case CWSUtil.ErrorCode.CARD_IS_LOCKED:
-                                            result = "The card is locked.";
-                                            break;
-                                        case CWSUtil.ErrorCode.NO_DATA:
-                                            result = "The card is empty.";
-                                            break;
-                                        default:
-                                            result = "The card is not empty.";
-                                    }
-                                }
-                                binding.tvResult.setText(result);
-                            }
-                        });
-                    }
+                    runOnUiThread(() -> showResult(msg));
                 }
             }).start();
         });
@@ -154,15 +166,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-//        IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-//        IntentFilter techDetected = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
-        IntentFilter[] nfcIntentFilter = new IntentFilter[]{tagDetected};
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         if (mNfcAdapter != null) {
-            mNfcAdapter.enableForegroundDispatch(this, pendingIntent, nfcIntentFilter, null);
+            mNfcAdapter.enableForegroundDispatch(this, pendingIntent, intentFilters, null);
         }
     }
 
@@ -178,19 +183,15 @@ public class MainActivity extends AppCompatActivity {
         super.onNewIntent(intent);
         mTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         Log.d(TAG, "onNewIntent: " + intent.getAction() + ", tag: " + mTag.toString());
-
-//        if (mNfcAdapter != null && mTag != null) {
-//            mNfcAdapter.ignore(mTag, 1000, new NfcAdapter.OnTagRemovedListener() {
-//                @Override
-//                public void onTagRemoved() {
-//                    Toast.makeText(MainActivity.this, "card is disconnected", Toast.LENGTH_SHORT).show();
-//                }
-//            }, new Handler(Looper.getMainLooper()));
-//        }
     }
 
     private void initNFC() {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+        IntentFilter tag = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+//        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+//        IntentFilter tech = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
+        intentFilters = new IntentFilter[] {tag};
     }
 
     private void showResult(String msg) {

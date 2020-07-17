@@ -25,7 +25,7 @@ public class CryptoUtil {
         return ciphertext;
         }catch(Exception e){
            // assertTrue("encryptAES",false);
-            return "Error!";
+            return "Error!" + e.toString();
         }
     }
 
@@ -41,7 +41,7 @@ public class CryptoUtil {
         return ciphertext;
         }catch(Exception e){
            // assertTrue("decryptAES",false);
-            return "Error!";
+            return "Error! " + e.toString();
         }
     }
 

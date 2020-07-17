@@ -29,6 +29,7 @@ public class CWSUtil {
         String BACKUP = "80320500";
         String RESTORE = "80340000";
         String RESET = "80360000";
+        String CHECK = "80380000";
         String SECURE_CHANNEL = "80CE000041";
     }
 
@@ -65,11 +66,7 @@ public class CWSUtil {
 
 
         String str;
-        try {
-            str = new String(newArray, "UTF-8");
-        } catch (IOException ex) {
-            str = ex.toString();
-        }
+        str = new String(newArray, StandardCharsets.UTF_8);
 
         return str;
     }
@@ -89,7 +86,7 @@ public class CWSUtil {
 
     public static String backup(String data, String pinCode, Tag tag) {
         String apduHeader = CWSUtil.Commands.BACKUP;  //max 255   05 tobyte
-        String command = "";
+        String command;
         byte[] dataBytes = data.getBytes();
         String hexData = bytesToHex(dataBytes);
         String HashPinCode = getSHA256StrJava(pinCode);
@@ -109,8 +106,8 @@ public class CWSUtil {
         return sendCmdWithSecureChannel(Commands.RESET, "", tag);
     }
 
-    public static void getTriesRemaining(Tag tag) {
-
+    public static String check(Tag tag) {
+        return sendCmdWithSecureChannel(Commands.CHECK, "", tag);
     }
 
     private static String sendCmdWithSecureChannel(String apduHeader, String cmd, Tag tag) {
@@ -128,15 +125,18 @@ public class CWSUtil {
             byte[] resultBytes = techHandle.transceive(bytes);
 
             String ret = byteArrayToHexStr(resultBytes);
-            System.out.println("result" + ret);
+            System.out.println("result: " + ret);
             if (ret.length() == 4) {
-                return "error" + ret;
+                return ret;
             }
             String installType = ret.substring(0, 4);
             int cardNameLength = HexUtil.toInt(ret.substring(4, 8));
             String cardNameHex = ret.substring(8, 8 + cardNameLength * 2);
-            ret = ret.substring(8 + cardNameLength * 2, ret.length());
+            ret = ret.substring(8 + cardNameLength * 2);
             String nonceIndex = ret.substring(0, 64);
+
+//            Log.i("CWSUtil", "The rest of ret: " + ret.substring(8, 40));
+//            String validationData = ret.substring(8, 40);
             String GenuineMasterPublicKey = null;
             String GenuineMasterChainCode = null;
             switch (installType) {
@@ -158,10 +158,11 @@ public class CWSUtil {
             String GenuineChild2PublicKey = KeyUtil.getChildPublicKey(GenuineChild1PublicKey, GenuineChild1ChainCode, nonceIndex);
 
             secureKey = KeyUtil.getEcdhKey(GenuineChild2PublicKey, sessionAppPrivateKey);
+//            Log.i("CWSUtil","CryptoUtil.decryptAES: " + CryptoUtil.decryptAES(secureKey, validationData));
             String[] apduCommand = sendSecureInner(apduHeader, cmd);
             int blockNumber = apduCommand.length;
             String[] apduResult = new String[blockNumber];
-            String tmp = "";
+            StringBuilder tmp = new StringBuilder();
             for (int i = 0; i < blockNumber; i++) {
                 System.out.println("apduCommand[" + (i + 1) + "/" + blockNumber + "]:" + apduCommand[i]);
                 byte[] bcmd = HexUtil.toByteArray(apduCommand[i]);
@@ -171,43 +172,42 @@ public class CWSUtil {
                 System.out.println("rtn:" + byteArrayToHexStr(resultByte));
 
                 if (result.length() == 4) {  //cmd
-                    tmp = tmp + byteArrayToHexStr(resultByte);
+                    tmp.append(byteArrayToHexStr(resultByte));
                 } else {
                     String resultSN = resultSecureInner(apduResult[i]);
                     if (resultSN.length() == 4) {
-                        tmp = tmp + resultSecureInner(apduResult[i]);
+                        tmp.append(resultSN);
 
                     } else {
-                        tmp = tmp + byteArrayToStr(hexStringToByteArray(resultSecureInner(apduResult[i])));
-
+                        tmp.append(byteArrayToStr(hexStringToByteArray(resultSN)));
                     }
                 }
             }
 
-            switch (tmp) {
+            switch (tmp.toString()) {
                 case ErrorCode.SUCCESS: {
-                    tmp = ErrorCode.SUCCESS;
+                    tmp = new StringBuilder(ErrorCode.SUCCESS);
                     break;
                 }
                 case ErrorCode.RESET_FIRST: {
-                    tmp = ErrorCode.RESET_FIRST;
+                    tmp = new StringBuilder(ErrorCode.RESET_FIRST);
                     break;
                 }
                 case ErrorCode.NO_DATA: {
-                    tmp = ErrorCode.NO_DATA;
+                    tmp = new StringBuilder(ErrorCode.NO_DATA);
                     break;
                 }
                 case ErrorCode.PIN_CODE_NOT_MATCH: {
-                    tmp = ErrorCode.PIN_CODE_NOT_MATCH;
+                    tmp = new StringBuilder(ErrorCode.PIN_CODE_NOT_MATCH);
                     break;
                 }
                 case ErrorCode.CARD_IS_LOCKED: {
-                    tmp = ErrorCode.CARD_IS_LOCKED;
+                    tmp = new StringBuilder(ErrorCode.CARD_IS_LOCKED);
                     break;
                 }
             }
 
-            return tmp;
+            return tmp.toString();
 
 
         } catch (Exception ex) {
@@ -269,7 +269,7 @@ public class CWSUtil {
             apduCommand[i] = commandHeader + commandLength + commandData;
         }
         String commandHeader = "80CC" + HexUtil.toHexString(blockNumber - 1, 1) + HexUtil.toHexString(blockNumber, 1);
-        String commandData = cipherData.substring((blockNumber - 1) * blockSize * 2, cipherData.length());
+        String commandData = cipherData.substring((blockNumber - 1) * blockSize * 2);
         String commandLength = HexUtil.toHexString(commandData.length() / 2, 1);
         apduCommand[blockNumber - 1] = commandHeader + commandLength + commandData;
         System.out.println("command:" + commandHeader + " " + commandData + " (" + (commandData.length() / 2) + "Bytes)");
@@ -280,24 +280,24 @@ public class CWSUtil {
         //int blockNumber = apduResult.length;
 
         String rtn = apduResult;
-        if (rtn.substring(rtn.length() - 4, rtn.length()).equalsIgnoreCase("9000")) {
+        if (rtn.substring(rtn.length() - 4).equalsIgnoreCase("9000")) {
             String decrypted = CryptoUtil.decryptAES(secureKey, rtn.substring(0, rtn.length() - 4));
             String decryptedHash = decrypted.substring(0, 64);
             String decryptedSalt = decrypted.substring(64, 72);
-            String decryptedData = decrypted.substring(72, decrypted.length());
+            String decryptedData = decrypted.substring(72);
 
             // reassemble returnData to origin form
             rtn = decryptedData + "9000";
-        } else if (rtn.substring(rtn.length() - 4, rtn.length()).equalsIgnoreCase("6350")) {
+        } else if (rtn.substring(rtn.length() - 4).equalsIgnoreCase("6350")) {
             String decrypted = CryptoUtil.decryptAES(secureKey, rtn.substring(0, rtn.length() - 4));
             String decryptedHash = decrypted.substring(0, 64);
             String decryptedSalt = decrypted.substring(64, 72);
-            String decryptedData = decrypted.substring(72, decrypted.length());
+            String decryptedData = decrypted.substring(72);
 
             // reassemble returnData to origin form
             rtn = decryptedData + "6350";
         }
-        System.out.println("result rtn" + rtn);
+        System.out.println("result rtn: " + rtn);
 
         return rtn;
     }
