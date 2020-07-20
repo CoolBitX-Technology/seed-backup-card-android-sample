@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter tag = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
 //        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
 //        IntentFilter tech = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
-        intentFilters = new IntentFilter[] {tag};
+        intentFilters = new IntentFilter[]{tag};
     }
 
     private void showResult(String msg) {

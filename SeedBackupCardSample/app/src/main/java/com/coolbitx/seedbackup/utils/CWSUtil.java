@@ -4,8 +4,9 @@ import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.util.Log;
 
+import org.bouncycastle.util.encoders.Hex;
+
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,7 +15,7 @@ import static com.coolbitx.seedbackup.utils.HexUtil.bytesToHex;
 import static com.coolbitx.seedbackup.utils.HexUtil.hexStringToByteArray;
 
 public class CWSUtil {
-
+    private static final String TAG = CWSUtil.class.getSimpleName();
     private static String secureKey = null;
 
     private static final String GenuineMasterChainCode_NonInstalled = "611c6956ca324d8656b50c39a0e5ef968ecd8997e22c28c11d56fb7d28313fa3";
@@ -133,9 +134,10 @@ public class CWSUtil {
             int cardNameLength = HexUtil.toInt(ret.substring(4, 8));
             String cardNameHex = ret.substring(8, 8 + cardNameLength * 2);
             ret = ret.substring(8 + cardNameLength * 2);
-            String nonceIndex = ret.substring(0, 64);
+            Log.d(TAG, "ret: " + ret);
+            String nonceIndex = ret.substring(0, 8);
 
-//            Log.i("CWSUtil", "The rest of ret: " + ret.substring(8, 40));
+//            Log.i(TAG, "The rest of ret: " + ret.substring(8, 40));
 //            String validationData = ret.substring(8, 40);
             String GenuineMasterPublicKey = null;
             String GenuineMasterChainCode = null;
@@ -152,17 +154,22 @@ public class CWSUtil {
                 default:
                     throw new Exception("Error");
             }
+            //String cardName = new String(Hex.decode(cardNameHex));
+            String cardNameHash = HashUtil.SHA256(cardNameHex);
+            String firstIndex = HexUtil.toHexString(HexUtil.toInt(cardNameHash.substring(0, 2)) & 0x7f, 1) + cardNameHash.substring(2, 8);
 
-            String GenuineChild1PublicKey = KeyUtil.getChildPublicKey(GenuineMasterPublicKey, GenuineMasterChainCode, cardNameHex);
-            String GenuineChild1ChainCode = KeyUtil.getChildChainCode(GenuineMasterPublicKey, GenuineMasterChainCode, cardNameHex);
+            String GenuineChild1PublicKey = KeyUtil.getChildPublicKey(GenuineMasterPublicKey, GenuineMasterChainCode, firstIndex);
+            String GenuineChild1ChainCode = KeyUtil.getChildChainCode(GenuineMasterPublicKey, GenuineMasterChainCode, firstIndex);
             String GenuineChild2PublicKey = KeyUtil.getChildPublicKey(GenuineChild1PublicKey, GenuineChild1ChainCode, nonceIndex);
+            Log.i(TAG, "GenuineChild2PublicKey: " + GenuineChild2PublicKey);
 
             secureKey = KeyUtil.getEcdhKey(GenuineChild2PublicKey, sessionAppPrivateKey);
-//            Log.i("CWSUtil","CryptoUtil.decryptAES: " + CryptoUtil.decryptAES(secureKey, validationData));
+//            Log.i(TAG,"CryptoUtil.decryptAES: " + CryptoUtil.decryptAES(secureKey, validationData));
             String[] apduCommand = sendSecureInner(apduHeader, cmd);
             int blockNumber = apduCommand.length;
             String[] apduResult = new String[blockNumber];
             StringBuilder tmp = new StringBuilder();
+            Log.d(TAG, "blocknumber: " + blockNumber);
             for (int i = 0; i < blockNumber; i++) {
                 System.out.println("apduCommand[" + (i + 1) + "/" + blockNumber + "]:" + apduCommand[i]);
                 byte[] bcmd = HexUtil.toByteArray(apduCommand[i]);
@@ -206,12 +213,12 @@ public class CWSUtil {
                     break;
                 }
             }
-
+            Log.i(TAG, "tmp: " + tmp.toString());
             return tmp.toString();
 
 
         } catch (Exception ex) {
-            Log.e("ex", ex.toString());
+            Log.e(TAG, "error: " + ex.toString());
             // showResult("error:" + ex.toString());
         } finally {
             try {
@@ -281,7 +288,10 @@ public class CWSUtil {
 
         String rtn = apduResult;
         if (rtn.substring(rtn.length() - 4).equalsIgnoreCase("9000")) {
-            String decrypted = CryptoUtil.decryptAES(secureKey, rtn.substring(0, rtn.length() - 4));
+            System.out.println("secureKey: " + secureKey);
+            System.out.println("rtn: " + rtn);
+            String decrypted = CryptoUtil.decryptAES(secureKey, rtn.substring(4, rtn.length() - 4));
+            System.out.println("decrypted: " + decrypted);
             String decryptedHash = decrypted.substring(0, 64);
             String decryptedSalt = decrypted.substring(64, 72);
             String decryptedData = decrypted.substring(72);
