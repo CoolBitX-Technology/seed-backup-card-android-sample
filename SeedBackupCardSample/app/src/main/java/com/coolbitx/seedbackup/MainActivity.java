@@ -5,15 +5,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.IsoDep;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.coolbitx.seedbackup.databinding.ActivityMainBinding;
 import com.coolbitx.seedbackup.utils.CWSUtil;
+import com.google.android.material.slider.Slider;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         CHECK,
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,43 +47,17 @@ public class MainActivity extends AppCompatActivity {
         initViews();
     }
 
-
     private void initViews() {
+        String dummyStr = getString(R.string.dummy_backup_msg_long);
+        binding.sliderTextLength.addOnChangeListener(new Slider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                binding.editBackup.setText(dummyStr.substring(0, (int)value));
+            }
+        });
 
         binding.btnCheck.setOnClickListener(view -> {
             currentMode = Mode.CHECK;
-
-
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    synchronized (this) {
-//                        // Check if the card is locked with default pin
-//                        final String msg = CWSUtil.restore("0000", mTag);
-//
-//                        binding.tvResult.post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//
-//                                String result = "";
-//                                if (!TextUtils.isEmpty(msg)) {
-//                                    switch (msg) {
-//                                        case CWSUtil.ErrorCode.CARD_IS_LOCKED:
-//                                            result = "The card is locked.";
-//                                            break;
-//                                        case CWSUtil.ErrorCode.NO_DATA:
-//                                            result = "The card is empty.";
-//                                            break;
-//                                        default:
-//                                            result = "The card is not empty.";
-//                                    }
-//                                }
-//                                binding.tvResult.setText(result);
-//                            }
-//                        });
-//                    }
-//                }
-//            }).start();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -198,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         StringBuilder result = new StringBuilder();
         if (msg == null) return;
         switch (msg) {
-            case CWSUtil.ErrorCode.SUCCESS:
+            case CWSUtil.ResultCode.SUCCESS:
                 if (currentMode == Mode.BACKUP) {
                     result.append("Backup");
                 } else if (currentMode == Mode.RESTORE) {
@@ -208,20 +182,31 @@ public class MainActivity extends AppCompatActivity {
                 }
                 result.append(" succeeded!");
                 break;
-            case CWSUtil.ErrorCode.RESET_FIRST:
+            case CWSUtil.ResultCode.RESET_FIRST:
                 result.append("You need to reset first.");
                 break;
-            case CWSUtil.ErrorCode.NO_DATA:
+            case CWSUtil.ResultCode.NO_DATA:
                 result.append("The card is empty.");
                 break;
-            case CWSUtil.ErrorCode.PIN_CODE_NOT_MATCH:
+            case CWSUtil.ResultCode.PIN_CODE_NOT_MATCH:
                 result.append("Your PIN doesn't match.");
                 break;
-            case CWSUtil.ErrorCode.CARD_IS_LOCKED:
+            case CWSUtil.ResultCode.CARD_IS_LOCKED:
                 result.append("The card is locked.");
                 break;
             default:
-                result.append(msg);
+                if (currentMode == Mode.CHECK) {
+                    int remaining = Integer.parseInt(msg.substring(0, 2));
+                    if (remaining == 0) {
+                        result.append("The card is locked.");
+                    } else {
+                        result.append("Attempts remaining: ");
+                        result.append(remaining);
+                    }
+                    result.append("\nThe card is ");
+                    result.append(msg.substring(2).equals("01")? "not empty." : "empty.");
+                } else
+                    result.append(msg);
         }
         binding.tvResult.setText(result.toString());
     }

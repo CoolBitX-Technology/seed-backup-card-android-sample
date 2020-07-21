@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.coolbitx.seedbackup.MainActivity">
+    android:layout_height="match_parent">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_backup"
@@ -14,6 +13,7 @@
         android:layout_marginHorizontal="@dimen/activity_margin"
         android:layout_marginTop="@dimen/activity_margin"
         android:hint="@string/backup_msg"
+        app:counterEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -32,7 +32,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/activity_margin"
-        android:layout_marginTop="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/view_margin"
         android:hint="@string/pin"
         app:endIconMode="password_toggle"
         app:layout_constraintEnd_toEndOf="parent"
@@ -47,30 +47,46 @@
             android:text="@string/dummy_pin" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:id="@+id/tv_result"
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider_text_length"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/view_margin"
+        android:stepSize="1.0"
+        android:valueFrom="0"
+        android:valueTo="240"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_input_pin" />
+
+    <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/activity_margin"
-        android:layout_marginHorizontal="@dimen/activity_margin"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline3"
         app:layout_constraintBottom_toTopOf="@id/btn_check"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_input_pin"
-        tools:text="error" />
+        app:layout_constraintTop_toBottomOf="@id/slider_text_length">
+
+        <TextView
+            android:id="@+id/tv_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+            tools:text="error" />
+    </ScrollView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_check"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/activity_margin"
-        android:padding="@dimen/button_padding"
         android:text="@string/check_card"
         app:layout_constraintBottom_toTopOf="@id/btn_backup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_backup"
@@ -79,7 +95,6 @@
         android:layout_marginStart="@dimen/activity_margin"
         android:layout_marginTop="@dimen/activity_margin"
         android:layout_marginEnd="@dimen/view_margin"
-        android:padding="@dimen/button_padding"
         android:text="@string/backup"
         app:layout_constraintBottom_toTopOf="@id/btn_reset"
         app:layout_constraintEnd_toStartOf="@id/btn_restore"
@@ -92,7 +107,6 @@
         android:layout_marginStart="@dimen/view_margin"
         android:layout_marginTop="@dimen/activity_margin"
         android:layout_marginEnd="@dimen/activity_margin"
-        android:padding="@dimen/button_padding"
         android:text="@string/restore"
         app:layout_constraintBottom_toTopOf="@id/btn_reset"
         app:layout_constraintEnd_toEndOf="parent"
@@ -105,7 +119,6 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/activity_margin"
         android:layout_marginBottom="@dimen/activity_margin"
-        android:padding="@dimen/button_padding"
         android:text="@string/reset"
         android:textColor="@color/colorRed"
         app:layout_constraintBottom_toBottomOf="parent"

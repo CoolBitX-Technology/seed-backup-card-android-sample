@@ -4,9 +4,8 @@ import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.util.Log;
 
-import org.bouncycastle.util.encoders.Hex;
-
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -34,7 +33,7 @@ public class CWSUtil {
         String SECURE_CHANNEL = "80CE000041";
     }
 
-    public interface ErrorCode {
+    public interface ResultCode {
         String SUCCESS = "9000";
         String RESET_FIRST = "6330";
         String NO_DATA = "6370";
@@ -126,7 +125,6 @@ public class CWSUtil {
             byte[] resultBytes = techHandle.transceive(bytes);
 
             String ret = byteArrayToHexStr(resultBytes);
-            System.out.println("result: " + ret);
             if (ret.length() == 4) {
                 return ret;
             }
@@ -134,7 +132,6 @@ public class CWSUtil {
             int cardNameLength = HexUtil.toInt(ret.substring(4, 8));
             String cardNameHex = ret.substring(8, 8 + cardNameLength * 2);
             ret = ret.substring(8 + cardNameLength * 2);
-            Log.d(TAG, "ret: " + ret);
             String nonceIndex = ret.substring(0, 8);
 
 //            Log.i(TAG, "The rest of ret: " + ret.substring(8, 40));
@@ -161,61 +158,80 @@ public class CWSUtil {
             String GenuineChild1PublicKey = KeyUtil.getChildPublicKey(GenuineMasterPublicKey, GenuineMasterChainCode, firstIndex);
             String GenuineChild1ChainCode = KeyUtil.getChildChainCode(GenuineMasterPublicKey, GenuineMasterChainCode, firstIndex);
             String GenuineChild2PublicKey = KeyUtil.getChildPublicKey(GenuineChild1PublicKey, GenuineChild1ChainCode, nonceIndex);
-            Log.i(TAG, "GenuineChild2PublicKey: " + GenuineChild2PublicKey);
 
             secureKey = KeyUtil.getEcdhKey(GenuineChild2PublicKey, sessionAppPrivateKey);
 //            Log.i(TAG,"CryptoUtil.decryptAES: " + CryptoUtil.decryptAES(secureKey, validationData));
             String[] apduCommand = sendSecureInner(apduHeader, cmd);
+
             int blockNumber = apduCommand.length;
+
             String[] apduResult = new String[blockNumber];
-            StringBuilder tmp = new StringBuilder();
-            Log.d(TAG, "blocknumber: " + blockNumber);
+
+            StringBuilder result = new StringBuilder();
+
             for (int i = 0; i < blockNumber; i++) {
-                System.out.println("apduCommand[" + (i + 1) + "/" + blockNumber + "]:" + apduCommand[i]);
+                Log.i(TAG, "apduCommand[" + (i + 1) + "/" + blockNumber + "]:" + apduCommand[i]);
                 byte[] bcmd = HexUtil.toByteArray(apduCommand[i]);
                 byte[] resultByte = techHandle.transceive(bcmd);
                 apduResult[i] = HexUtil.toHexString(resultByte, resultByte.length);
-                String result = byteArrayToHexStr(resultByte);
-                System.out.println("rtn:" + byteArrayToHexStr(resultByte));
+                String resultHexStr = byteArrayToHexStr(resultByte);
 
-                if (result.length() == 4) {  //cmd
-                    tmp.append(byteArrayToHexStr(resultByte));
-                } else {
-                    String resultSN = resultSecureInner(apduResult[i]);
-                    if (resultSN.length() == 4) {
-                        tmp.append(resultSN);
+                Log.i(TAG, "byteArrayToHexStr(resultByte):" + resultHexStr);
 
-                    } else {
-                        tmp.append(byteArrayToStr(hexStringToByteArray(resultSN)));
+//                if (resultHexStr.length() == 4) {
+//                    // all errors
+//                    result.append(byteArrayToHexStr(resultByte));
+//                }
+//
+                String postfix = apduResult[i].substring(apduResult[i].length() - 4);
+
+                Log.i(TAG, "result code: " + postfix);
+                if (postfix.equals(ResultCode.SUCCESS)) {
+                    // success
+                    String data;
+                    switch (apduHeader) {
+                        case Commands.CHECK:
+                            // first 2 digits mean remaining tries (i.e. 03 means 3 remaining tries)
+                            // last 2 digits mean empty (00) or occupied (01)
+                            data = getDecryptedSuccessData(apduResult[i]);
+                            result.append(data.substring(0, 4));
+                            break;
+                        case Commands.RESTORE:
+                            data = getDecryptedSuccessData(apduResult[i]);
+                            result.append(byteArrayToStr(hexStringToByteArray(data)));
+                            break;
+                        case Commands.BACKUP:
+                            if (i != blockNumber - 1) continue;
+                        case Commands.RESET:
+                        default:
+                            result.append(postfix);
                     }
+                } else {
+                    // error
+                    result.append(resultHexStr);
                 }
+
+
+//                if (successData.length() == 4) {
+//                    // all success - 9000
+//                    Log.i(TAG, "successData.length() == 4: " + successData);
+//                    result = new StringBuilder(successData);
+//                }
+//
+//                if (apduHeader.equals(Commands.CHECK)) {
+//                    // first 2 digits mean remaining tries (i.e. 03 means 3 remaining tries)
+//                    // last 2 digits mean empty (00) or occupied (01)
+//                    return successData.substring(0, 4);
+//                } else {
+//                    Log.i(TAG, "resultSN.length() != 4");
+//                    result.append(byteArrayToStr(hexStringToByteArray(successData)));
+//                }
+
             }
 
-            switch (tmp.toString()) {
-                case ErrorCode.SUCCESS: {
-                    tmp = new StringBuilder(ErrorCode.SUCCESS);
-                    break;
-                }
-                case ErrorCode.RESET_FIRST: {
-                    tmp = new StringBuilder(ErrorCode.RESET_FIRST);
-                    break;
-                }
-                case ErrorCode.NO_DATA: {
-                    tmp = new StringBuilder(ErrorCode.NO_DATA);
-                    break;
-                }
-                case ErrorCode.PIN_CODE_NOT_MATCH: {
-                    tmp = new StringBuilder(ErrorCode.PIN_CODE_NOT_MATCH);
-                    break;
-                }
-                case ErrorCode.CARD_IS_LOCKED: {
-                    tmp = new StringBuilder(ErrorCode.CARD_IS_LOCKED);
-                    break;
-                }
-            }
-            Log.i(TAG, "tmp: " + tmp.toString());
-            return tmp.toString();
 
+            Log.i(TAG, "result: " + result.toString());
+            return result.toString();
 
         } catch (Exception ex) {
             Log.e(TAG, "error: " + ex.toString());
@@ -223,8 +239,8 @@ public class CWSUtil {
         } finally {
             try {
                 techHandle.close();
-            } catch (Exception ex) {
-                // showResult("error:" + ex.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         return null;
@@ -283,32 +299,22 @@ public class CWSUtil {
         return apduCommand;
     }
 
-    private static String resultSecureInner(String apduResult) {
+    private static String getDecryptedSuccessData(String apduResult) {
         //int blockNumber = apduResult.length;
+        Log.d(TAG, "resultSecureInner - apduResult: " + apduResult);
 
-        String rtn = apduResult;
-        if (rtn.substring(rtn.length() - 4).equalsIgnoreCase("9000")) {
-            System.out.println("secureKey: " + secureKey);
-            System.out.println("rtn: " + rtn);
-            String decrypted = CryptoUtil.decryptAES(secureKey, rtn.substring(4, rtn.length() - 4));
-            System.out.println("decrypted: " + decrypted);
-            String decryptedHash = decrypted.substring(0, 64);
-            String decryptedSalt = decrypted.substring(64, 72);
-            String decryptedData = decrypted.substring(72);
+        String postfix = apduResult.substring(apduResult.length() - 4);
+        Log.d(TAG, "resultSecureInner - postfix: " + postfix);
 
-            // reassemble returnData to origin form
-            rtn = decryptedData + "9000";
-        } else if (rtn.substring(rtn.length() - 4).equalsIgnoreCase("6350")) {
-            String decrypted = CryptoUtil.decryptAES(secureKey, rtn.substring(0, rtn.length() - 4));
-            String decryptedHash = decrypted.substring(0, 64);
-            String decryptedSalt = decrypted.substring(64, 72);
-            String decryptedData = decrypted.substring(72);
 
-            // reassemble returnData to origin form
-            rtn = decryptedData + "6350";
-        }
-        System.out.println("result rtn: " + rtn);
+        String decrypted = CryptoUtil.decryptAES(secureKey, apduResult.substring(4, apduResult.length() - 4));
+        String decryptedHash = decrypted.substring(0, 64);
+        String decryptedSalt = decrypted.substring(64, 72);
+        String decryptedData = decrypted.substring(72);
 
-        return rtn;
+
+        Log.d(TAG, "resultSecureInner - decryptedData: " + decryptedData);
+
+        return decryptedData + ResultCode.SUCCESS;
     }
 }

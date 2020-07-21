@@ -12,8 +12,13 @@
     <string name="pin">PIN</string>
     <string name="backup_msg">Backup Message</string>
 
-    <!-- input field placeholder -->
-    <string name="dummy_backup_msg">Hello World!</string>
+    <!-- input field placeholder 240 chars -->
+    <string name="dummy_backup_msg_long">Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+        Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis
+        parturient montes,nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu.</string>
+    <!-- input field placeholder 240 chars -->
+    <string name="dummy_backup_msg">resource crush foil rocket stereo please sort work resource
+        weird win rocket cat hidden scout milk era wage metal settle surge noodle run great</string>
     <string name="dummy_pin">0000</string>
 
     <!-- input field error message -->
