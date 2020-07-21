@@ -117,12 +117,12 @@ public class CWSUtil {
             String sessionAppPublicKey = KeyUtil.getPublicKey(sessionAppPrivateKey);
             String command = Commands.SECURE_CHANNEL;
             command = command + sessionAppPublicKey;
-            System.out.println("command:" + command);
-            byte[] bytes = hexStringToByteArray(command);
+            byte[] commandBytes = hexStringToByteArray(command);
+
             techHandle = IsoDep.get(tag);
             if (techHandle.isConnected()) techHandle.close();
             techHandle.connect();
-            byte[] resultBytes = techHandle.transceive(bytes);
+            byte[] resultBytes = techHandle.transceive(commandBytes);
 
             String ret = byteArrayToHexStr(resultBytes);
             if (ret.length() == 4) {
@@ -174,15 +174,10 @@ public class CWSUtil {
                 byte[] bcmd = HexUtil.toByteArray(apduCommand[i]);
                 byte[] resultByte = techHandle.transceive(bcmd);
                 apduResult[i] = HexUtil.toHexString(resultByte, resultByte.length);
-                String resultHexStr = byteArrayToHexStr(resultByte);
 
+                String resultHexStr = byteArrayToHexStr(resultByte);
                 Log.i(TAG, "byteArrayToHexStr(resultByte):" + resultHexStr);
 
-//                if (resultHexStr.length() == 4) {
-//                    // all errors
-//                    result.append(byteArrayToHexStr(resultByte));
-//                }
-//
                 String postfix = apduResult[i].substring(apduResult[i].length() - 4);
 
                 Log.i(TAG, "result code: " + postfix);
@@ -193,11 +188,11 @@ public class CWSUtil {
                         case Commands.CHECK:
                             // first 2 digits mean remaining tries (i.e. 03 means 3 remaining tries)
                             // last 2 digits mean empty (00) or occupied (01)
-                            data = getDecryptedSuccessData(apduResult[i]);
-                            result.append(data.substring(0, 4));
+                            data = getDecryptedSData(apduResult[i]);
+                            result.append(data);
                             break;
                         case Commands.RESTORE:
-                            data = getDecryptedSuccessData(apduResult[i]);
+                            data = getDecryptedSData(apduResult[i]) + ResultCode.SUCCESS;
                             result.append(byteArrayToStr(hexStringToByteArray(data)));
                             break;
                         case Commands.BACKUP:
@@ -210,25 +205,7 @@ public class CWSUtil {
                     // error
                     result.append(resultHexStr);
                 }
-
-
-//                if (successData.length() == 4) {
-//                    // all success - 9000
-//                    Log.i(TAG, "successData.length() == 4: " + successData);
-//                    result = new StringBuilder(successData);
-//                }
-//
-//                if (apduHeader.equals(Commands.CHECK)) {
-//                    // first 2 digits mean remaining tries (i.e. 03 means 3 remaining tries)
-//                    // last 2 digits mean empty (00) or occupied (01)
-//                    return successData.substring(0, 4);
-//                } else {
-//                    Log.i(TAG, "resultSN.length() != 4");
-//                    result.append(byteArrayToStr(hexStringToByteArray(successData)));
-//                }
-
             }
-
 
             Log.i(TAG, "result: " + result.toString());
             return result.toString();
@@ -299,7 +276,7 @@ public class CWSUtil {
         return apduCommand;
     }
 
-    private static String getDecryptedSuccessData(String apduResult) {
+    private static String getDecryptedSData(String apduResult) {
         //int blockNumber = apduResult.length;
         Log.d(TAG, "resultSecureInner - apduResult: " + apduResult);
 
@@ -312,9 +289,8 @@ public class CWSUtil {
         String decryptedSalt = decrypted.substring(64, 72);
         String decryptedData = decrypted.substring(72);
 
-
         Log.d(TAG, "resultSecureInner - decryptedData: " + decryptedData);
 
-        return decryptedData + ResultCode.SUCCESS;
+        return decryptedData;
     }
 }

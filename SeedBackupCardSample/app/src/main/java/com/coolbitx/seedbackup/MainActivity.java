@@ -8,6 +8,9 @@ import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,13 +51,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        String dummyStr = getString(R.string.dummy_backup_msg_long);
-        binding.sliderTextLength.addOnChangeListener(new Slider.OnChangeListener() {
-            @Override
-            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                binding.editBackup.setText(dummyStr.substring(0, (int)value));
-            }
-        });
+
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
+        String[] dummyStrList = new String[]{getString(R.string.dummy_backup_msg), getString(R.string.dummy_backup_msg_long)};
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_text, dummyStrList);
+        ((AutoCompleteTextView) binding.textBackup).setAdapter(adapter);
+
 
         binding.btnCheck.setOnClickListener(view -> {
             currentMode = Mode.CHECK;
@@ -71,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         binding.btnBackup.setOnClickListener(view -> {
             currentMode = Mode.BACKUP;
             if (mTag != null) {
-                if (TextUtils.isEmpty(binding.editBackup.getText())) {
+                if (TextUtils.isEmpty(binding.textBackup.getText())) {
                     binding.textInputBackup.setError(getString(R.string.cant_be_blank));
                     binding.textInputBackup.setErrorEnabled(true);
                     return;
@@ -89,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         final String msg = CWSUtil.backup(
-                                binding.editBackup.getText().toString(),
+                                binding.textBackup.getText().toString(),
                                 binding.editPin.getText().toString(),
                                 mTag);
 
@@ -204,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                         result.append(remaining);
                     }
                     result.append("\nThe card is ");
-                    result.append(msg.substring(2).equals("01")? "not empty." : "empty.");
+                    result.append(msg.substring(2).equals("01") ? "not empty." : "empty.");
                 } else
                     result.append(msg);
         }

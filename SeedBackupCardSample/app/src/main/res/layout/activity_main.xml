@@ -4,24 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_backup"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/activity_margin"
         android:layout_marginTop="@dimen/activity_margin"
-        android:hint="@string/backup_msg"
         app:counterEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_backup"
+        <AutoCompleteTextView
+            android:id="@+id/text_backup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/backup_msg"
             android:inputType="text"
             android:text="@string/dummy_backup_msg" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -34,7 +36,6 @@
         android:layout_marginHorizontal="@dimen/activity_margin"
         android:layout_marginTop="@dimen/view_margin"
         android:hint="@string/pin"
-        app:endIconMode="password_toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_input_backup">
@@ -43,23 +44,9 @@
             android:id="@+id/edit_pin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberPassword"
+            android:inputType="number"
             android:text="@string/dummy_pin" />
     </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.slider.Slider
-        android:id="@+id/slider_text_length"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/activity_margin"
-        android:layout_marginTop="@dimen/view_margin"
-        android:stepSize="1.0"
-        android:valueFrom="0"
-        android:valueTo="240"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_input_pin" />
 
     <ScrollView
         android:layout_width="0dp"
@@ -68,7 +55,7 @@
         app:layout_constraintBottom_toTopOf="@id/btn_check"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/slider_text_length">
+        app:layout_constraintTop_toBottomOf="@id/text_input_pin">
 
         <TextView
             android:id="@+id/tv_result"
