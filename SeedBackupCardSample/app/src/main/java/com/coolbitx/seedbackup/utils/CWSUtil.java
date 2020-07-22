@@ -25,7 +25,7 @@ public class CWSUtil {
 
     private static IsoDep techHandle = null;
 
-    private interface Commands {
+    private interface Command {
         String BACKUP = "80320500";
         String RESTORE = "80340000";
         String RESET = "80360000";
@@ -85,7 +85,7 @@ public class CWSUtil {
     }
 
     public static String backup(String data, String pinCode, Tag tag) {
-        String apduHeader = CWSUtil.Commands.BACKUP;  //max 255   05 tobyte
+        String apduHeader = Command.BACKUP;  //max 255   05 tobyte
         String command;
         byte[] dataBytes = data.getBytes();
         String hexData = bytesToHex(dataBytes);
@@ -95,7 +95,7 @@ public class CWSUtil {
     }
 
     public static String restore(String pinCode, Tag tag) {
-        String apduHeader = Commands.RESTORE;
+        String apduHeader = Command.RESTORE;
         String command = "";
         String HashPinCode = getSHA256StrJava(pinCode);
         command = command + HashPinCode;
@@ -103,11 +103,11 @@ public class CWSUtil {
     }
 
     public static String reset(Tag tag) {
-        return sendCmdWithSecureChannel(Commands.RESET, "", tag);
+        return sendCmdWithSecureChannel(Command.RESET, "", tag);
     }
 
     public static String check(Tag tag) {
-        return sendCmdWithSecureChannel(Commands.CHECK, "", tag);
+        return sendCmdWithSecureChannel(Command.CHECK, "", tag);
     }
 
     private static String sendCmdWithSecureChannel(String apduHeader, String cmd, Tag tag) {
@@ -115,7 +115,7 @@ public class CWSUtil {
         try {
             String sessionAppPrivateKey = CommonUtil.hexRandom(32);
             String sessionAppPublicKey = KeyUtil.getPublicKey(sessionAppPrivateKey);
-            String command = Commands.SECURE_CHANNEL;
+            String command = Command.SECURE_CHANNEL;
             command = command + sessionAppPublicKey;
             byte[] commandBytes = hexStringToByteArray(command);
 
@@ -185,19 +185,21 @@ public class CWSUtil {
                     // success
                     String data;
                     switch (apduHeader) {
-                        case Commands.CHECK:
-                            // first 2 digits mean remaining tries (i.e. 03 means 3 remaining tries)
-                            // last 2 digits mean empty (00) or occupied (01)
-                            data = getDecryptedSData(apduResult[i]);
+                        case Command.CHECK:
+                            // the first 2 digits mean the remaining tries (i.e. 03 means 3 remaining tries)
+                            // the last 2 digits mean the card is empty (00) or occupied (01)
+                            data = getDecryptedData(apduResult[i]);
                             result.append(data);
                             break;
-                        case Commands.RESTORE:
-                            data = getDecryptedSData(apduResult[i]) + ResultCode.SUCCESS;
-                            result.append(byteArrayToStr(hexStringToByteArray(data)));
+                        case Command.RESTORE:
+                            data = getDecryptedData(apduResult[i]) + ResultCode.SUCCESS;
+                            Log.d(TAG, "data: " + data);
+                            if (!data.equals(ResultCode.SUCCESS))
+                                result.append(byteArrayToStr(hexStringToByteArray(data)));
                             break;
-                        case Commands.BACKUP:
+                        case Command.BACKUP:
                             if (i != blockNumber - 1) continue;
-                        case Commands.RESET:
+                        case Command.RESET:
                         default:
                             result.append(postfix);
                     }
@@ -276,15 +278,18 @@ public class CWSUtil {
         return apduCommand;
     }
 
-    private static String getDecryptedSData(String apduResult) {
-        //int blockNumber = apduResult.length;
+    private static String getDecryptedData(String apduResult) {
         Log.d(TAG, "resultSecureInner - apduResult: " + apduResult);
 
         String postfix = apduResult.substring(apduResult.length() - 4);
         Log.d(TAG, "resultSecureInner - postfix: " + postfix);
 
+        String blockIndex = apduResult.substring(0, 2);
+        String blockNumber = apduResult.substring(2, 4);
+        Log.d(TAG, "resultSecureInner - blockIndex: " + blockIndex + ", blockNumber: " + blockNumber);
 
         String decrypted = CryptoUtil.decryptAES(secureKey, apduResult.substring(4, apduResult.length() - 4));
+        Log.d(TAG, "resultSecureInner - decrypted: " + decrypted);
         String decryptedHash = decrypted.substring(0, 64);
         String decryptedSalt = decrypted.substring(64, 72);
         String decryptedData = decrypted.substring(72);

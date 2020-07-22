@@ -1,18 +1,17 @@
 
 package com.coolbitx.seedbackup.utils;
 
+import org.spongycastle.util.encoders.Hex;
+
 import java.nio.ByteBuffer;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.spongycastle.util.encoders.Hex;
 
-/**
- * @author liu
- */
 public class CryptoUtil {
+    private static final String TAG = CryptoUtil.class.getSimpleName();
 
     public static String encryptAES(String key, String plain) {
         try {
@@ -25,7 +24,7 @@ public class CryptoUtil {
             String ciphertext = Hex.toHexString(cipher.doFinal(Hex.decode(plain)));
             return ciphertext;
         } catch (Exception e) {
-            // assertTrue("encryptAES",false);
+//             assertTrue("encryptAES",false);
             return "Error!" + e.toString();
         }
     }
@@ -41,7 +40,7 @@ public class CryptoUtil {
             String ciphertext = Hex.toHexString(cipher.doFinal(Hex.decode(plain)));
             return ciphertext;
         } catch (Exception e) {
-            // assertTrue("decryptAES",false);
+//             assertTrue("decryptAES",false);
             return "Error! " + e.toString();
         }
     }

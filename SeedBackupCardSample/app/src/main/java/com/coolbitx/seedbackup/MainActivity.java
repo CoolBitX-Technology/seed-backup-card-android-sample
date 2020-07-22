@@ -53,13 +53,11 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
 
         View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
         String[] dummyStrList = new String[]{getString(R.string.dummy_backup_msg), getString(R.string.dummy_backup_msg_long)};
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_text, dummyStrList);
-        ((AutoCompleteTextView) binding.textBackup).setAdapter(adapter);
+        binding.textBackup.setAdapter(adapter);
 
 
         binding.btnCheck.setOnClickListener(view -> {
