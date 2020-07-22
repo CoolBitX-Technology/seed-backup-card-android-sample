@@ -193,9 +193,7 @@ public class CWSUtil {
                             break;
                         case Command.RESTORE:
                             data = getDecryptedData(apduResult[i]) + ResultCode.SUCCESS;
-                            Log.d(TAG, "data: " + data);
-                            if (!data.equals(ResultCode.SUCCESS))
-                                result.append(byteArrayToStr(hexStringToByteArray(data)));
+                            result.append(byteArrayToStr(hexStringToByteArray(data)));
                             break;
                         case Command.BACKUP:
                             if (i != blockNumber - 1) continue;
