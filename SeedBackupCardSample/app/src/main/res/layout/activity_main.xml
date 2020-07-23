@@ -51,7 +51,7 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/activity_margin"
+        android:layout_marginVertical="@dimen/activity_margin"
         app:layout_constraintBottom_toTopOf="@id/btn_check"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -61,6 +61,7 @@
             android:id="@+id/tv_result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/activity_margin"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
             tools:text="error" />
     </ScrollView>
@@ -80,7 +81,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/activity_margin"
-        android:layout_marginTop="@dimen/activity_margin"
         android:layout_marginEnd="@dimen/view_margin"
         android:text="@string/backup"
         app:layout_constraintBottom_toTopOf="@id/btn_reset"
@@ -92,7 +92,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/view_margin"
-        android:layout_marginTop="@dimen/activity_margin"
         android:layout_marginEnd="@dimen/activity_margin"
         android:text="@string/restore"
         app:layout_constraintBottom_toTopOf="@id/btn_reset"
@@ -105,7 +104,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/activity_margin"
-        android:layout_marginBottom="@dimen/activity_margin"
         android:text="@string/reset"
         android:textColor="@color/colorRed"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -10,14 +10,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.coolbitx.seedbackup.databinding.ActivityMainBinding;
 import com.coolbitx.seedbackup.utils.CWSUtil;
-import com.google.android.material.slider.Slider;
 
 public class MainActivity extends AppCompatActivity {
 

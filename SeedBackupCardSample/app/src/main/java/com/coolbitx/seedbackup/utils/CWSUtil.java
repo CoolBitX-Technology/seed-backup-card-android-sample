@@ -55,21 +55,13 @@ public class CWSUtil {
     }
 
     private static String byteArrayToStr(byte[] byteArray) {
-
         if (byteArray == null) return null;
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        for (int i = 0; i < byteArray.length; i++) {
-            int tmp = byteArray[i];
-            if (tmp > 0) output.write(byteArray[i]);
+        for (int b : byteArray) {
+            if (b > 0) output.write(b);
         }
-        byte[] newArray = output.toByteArray();
-
-
-        String str;
-        str = new String(newArray, StandardCharsets.UTF_8);
-
-        return str;
+        return new String(output.toByteArray(), StandardCharsets.UTF_8);
     }
 
     public static String getSHA256StrJava(String str) {
