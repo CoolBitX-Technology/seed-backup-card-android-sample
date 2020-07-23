@@ -55,7 +55,10 @@ public class MainActivity extends AppCompatActivity {
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
-        String[] dummyStrList = new String[]{getString(R.string.dummy_backup_msg), getString(R.string.dummy_backup_msg_long)};
+        String[] dummyStrList = new String[]{
+                getString(R.string.dummy_backup_msg),
+                getString(R.string.dummy_backup_msg_long),
+                getString(R.string.dummy_backup_msg_extremely_long),};
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_text, dummyStrList);
         binding.textBackup.setAdapter(adapter);
 

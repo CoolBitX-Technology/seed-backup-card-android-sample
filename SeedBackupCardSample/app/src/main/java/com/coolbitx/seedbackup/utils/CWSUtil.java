@@ -27,9 +27,10 @@ public class CWSUtil {
 
     private interface Command {
         String BACKUP = "80320500";
-        String RESTORE = "80340000";
+        String GET_CARD_INFO = "80380000";
+        String GET_NEXT_PARTIAL_ENCRYPTED = "80C20000";
         String RESET = "80360000";
-        String CHECK = "80380000";
+        String RESTORE = "80340000";
         String SECURE_CHANNEL = "80CE000041";
     }
 
@@ -107,7 +108,7 @@ public class CWSUtil {
     }
 
     public static String check(Tag tag) {
-        return sendCmdWithSecureChannel(Command.CHECK, "", tag);
+        return sendCmdWithSecureChannel(Command.GET_CARD_INFO, "", tag);
     }
 
     private static String sendCmdWithSecureChannel(String apduHeader, String cmd, Tag tag) {
@@ -185,14 +186,27 @@ public class CWSUtil {
                     // success
                     String data;
                     switch (apduHeader) {
-                        case Command.CHECK:
+                        case Command.GET_CARD_INFO:
                             // the first 2 digits mean the remaining tries (i.e. 03 means 3 remaining tries)
                             // the last 2 digits mean the card is empty (00) or occupied (01)
-                            data = getDecryptedData(apduResult[i]);
+                            data = getDecryptedData(getPartialEncryptedData(apduResult[i]));
                             result.append(data);
                             break;
                         case Command.RESTORE:
-                            data = getDecryptedData(apduResult[i]) + ResultCode.SUCCESS;
+                            StringBuilder concatEncrypted = new StringBuilder(getPartialEncryptedData(apduResult[i]));
+                            int indexOfBlock = Integer.parseInt(apduResult[i].substring(0, 2));
+                            int numberOfBlocks = Integer.parseInt(apduResult[i].substring(2, 4));
+
+                            while (indexOfBlock + 1 < numberOfBlocks) {
+                                Log.d(TAG, "block " + (indexOfBlock + 1) + " out of " + numberOfBlocks);
+                                byte[] nextEncrypted = techHandle.transceive(getCmdToGetNextPartialEncryptedData());
+                                String apduNextResult = HexUtil.toHexString(nextEncrypted, nextEncrypted.length);
+                                Log.d(TAG, "apduNextResult: " + apduNextResult);
+                                concatEncrypted.append(getPartialEncryptedData(apduNextResult));
+                                indexOfBlock++;
+                            }
+                            Log.d(TAG, "concatEncrypted: " + concatEncrypted.toString());
+                            data = getDecryptedData(concatEncrypted.toString());
                             result.append(byteArrayToStr(hexStringToByteArray(data)));
                             break;
                         case Command.BACKUP:
@@ -211,6 +225,7 @@ public class CWSUtil {
             return result.toString();
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             Log.e(TAG, "error: " + ex.toString());
             // showResult("error:" + ex.toString());
         } finally {
@@ -276,24 +291,22 @@ public class CWSUtil {
         return apduCommand;
     }
 
-    private static String getDecryptedData(String apduResult) {
-        Log.d(TAG, "resultSecureInner - apduResult: " + apduResult);
+    private static String getPartialEncryptedData(String apduReturnResult) {
+        Log.d(TAG, "getPartialEncryptedData - apduReturnResult: " + apduReturnResult + ", length: " + apduReturnResult.length());
+        return apduReturnResult.substring(4, apduReturnResult.length() - 4);
+    }
 
-        String postfix = apduResult.substring(apduResult.length() - 4);
-        Log.d(TAG, "resultSecureInner - postfix: " + postfix);
-
-        String blockIndex = apduResult.substring(0, 2);
-        String blockNumber = apduResult.substring(2, 4);
-        Log.d(TAG, "resultSecureInner - blockIndex: " + blockIndex + ", blockNumber: " + blockNumber);
-
-        String decrypted = CryptoUtil.decryptAES(secureKey, apduResult.substring(4, apduResult.length() - 4));
-        Log.d(TAG, "resultSecureInner - decrypted: " + decrypted);
+    private static String getDecryptedData(String fullLengthEncryptedData) {
+        String decrypted = CryptoUtil.decryptAES(secureKey, fullLengthEncryptedData);
+        Log.d(TAG, "getDecryptedData - decrypted: " + decrypted + ", length: " + decrypted.length());
         String decryptedHash = decrypted.substring(0, 64);
         String decryptedSalt = decrypted.substring(64, 72);
         String decryptedData = decrypted.substring(72);
-
-        Log.d(TAG, "resultSecureInner - decryptedData: " + decryptedData);
-
+        Log.d(TAG, "getDecryptedData - decryptedData: " + decryptedData);
         return decryptedData;
+    }
+
+    private static byte[] getCmdToGetNextPartialEncryptedData() {
+        return HexUtil.toByteArray(Command.GET_NEXT_PARTIAL_ENCRYPTED);
     }
 }

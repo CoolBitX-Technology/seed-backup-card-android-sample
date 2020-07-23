@@ -12,15 +12,42 @@
     <string name="pin">PIN</string>
     <string name="backup_msg">Backup Message</string>
 
-    <!-- input field placeholder 240 chars -->
-    <string name="dummy_backup_msg_long">Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-        Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis
-        parturient montes,nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu.</string>
-    <!-- input field placeholder 240 chars -->
-    <string name="dummy_backup_msg">resource crush foil rocket stereo please sort work resource
-        weird win rocket cat hidden scout milk era wage metal settle surge noodle run great</string>
-    <string name="dummy_pin">0000</string>
-
     <!-- input field error message -->
     <string name="cant_be_blank">This field can\'t be blank</string>
+
+    <!-- input field placeholder backup message short version -->
+    <string name="dummy_backup_msg">resource crush foil rocket stereo please sort work resource
+        weird win rocket cat hidden scout milk era wage metal settle surge noodle run great</string>
+    <!-- input field placeholder backup message long version -->
+    <string name="dummy_backup_msg_long">These violent delights have violent ends and in their triumph die,
+        like fire and powder, which, as they kiss, consume. The sweetest honey Is loathsome in his
+        own deliciousness and in the taste confounds the appetite. Therefore love moderately;
+        long love doth so; too swift arrives as tardy as too slow.</string>
+
+    <string name="dummy_backup_msg_extremely_long">As most of my readers know, I’m an optimist.
+        \nThis belief applies across my life, and to various investments as well. So I am intrigued by the
+        success of cryptocurrencies, such as Bitcoin and Ethereum. The competition they are putting
+        up against the gold standard looks insane, as Bitcoin goes off to the races.
+        There’s no way to fully understand what’s going on in the crypto world — and I am not even
+        sure anyone could if you tried to. Still, I can tell you that Bitcoin’s recent surge is
+        really an opportunity to buy long-term real assets.
+        \nCryptocurrencies are new and don’t even have a useful underlying technology.
+        They will probably fail, probably sooner than later. If people forget about them quickly,
+        it is likely to be because the underlying technology will finally mature and win out.
+        We don’t even know whether that will happen in a generation or maybe a century,
+        but it’s still possible it might.
+        \nWhy invest in crypto now, if it’s unlikely to last?
+        \nThe crypto world is more than one day old, and a lot of its early enthusiasts are
+        looking back at what they did wrong. But most are still in it.
+        There is still a lot of potential, and potentially a lot of wealth to be made.
+        \nImagine the world right now, say 10 years from now. Have you invested in things like gold,
+        real estate, or corporations?
+        \nDo you think your assets will continue to appreciate,or will you have lost out to inflation
+        and depreciation?\nGold has a history of doing that, but with corporate stock I’d be worried. Why?
+        If you look at the past, corporate stocks and bonds aren’t exactly reliable long-term
+        sources of capital. They tend to move in the same direction, and in the short run they tend
+        to go down.
+    </string>
+    <!-- input field placeholder PIN -->
+    <string name="dummy_pin">0000</string>
 </resources>
