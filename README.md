@@ -44,7 +44,7 @@ Use NFC in Android
 
 Work with Android NFC
 ---------------------
-1. Request NFC access in the Android manifest
+### 1. Request NFC access in the Android manifest
 Declare the following items in your app's ```AndroidManifest.xml``` file:
 
 - The permission to access the NFC hardware
@@ -62,7 +62,7 @@ Declare the following items in your app's ```AndroidManifest.xml``` file:
 <uses-feature android:name="android.hardware.nfc" android:required="true" />
 ``` 
 
-2. Use NFC adapter
+### 2. Use NFC adapter
 - Initialize NFC adapter in ```onCreate()```.
 ```java
 @Override
@@ -72,6 +72,7 @@ protected void onCreate(Bundle savedInstanceState) {
 }
 ```
 - Use the foreground dispatch system
+
 The **foreground dispatch system** allows an activity to intercept an NFC intent (i.e. tag detected) 
 and claim priority over other activities that are registered to handle the same intent. 
 This way, when our application is in the foreground, 
@@ -79,11 +80,13 @@ users won't be prompted to choose which application to open, and the intent is s
 
 For more details on foreground dispatch system, please check the [link](https://developer.android.com/guide/topics/connectivity/nfc/advanced-nfc#foreground-dispatch).
 
-BackUp
+Usage
 -----
+
+### BackUp
 Store the given data and PIN in the card
 ```java
-private String backup(String backupMessage, String pin) {
+public static String backup(String backupMessage, String pin) {
     byte[] _data = backupMessage.getBytes();
     String hexData = bytesToHex(_data);
     String HashPinCode = getSHA256StrJava(pin);
@@ -92,27 +95,24 @@ private String backup(String backupMessage, String pin) {
 }
 ```
 
-Restore
--------
+### Restore
 Get the contents of the card by specifying the **valid** PIN
 ```java
-private String restore(String pin) {
+public static String restore(String pin) {
     String hashedPinCode = getSHA256StrJava(pin);
     return sendCmdWithSecureChannel(Commands.RESTORE, hashedPinCode);
 }
 ```
 
-Reset
------
+### Reset
 Erase the contents of the card. (PIN will be retained)
 ```java
-private String reset() {
+public static String reset() {
     return sendCmdWithSecureChannel(Commands.RESET, "");
 }
 ```
 
-Get the information of the card
--------------------------------
+### Get the information of the card
 Get the information of the card
 ```java
 public static String getCardInfo() {
