@@ -1,87 +1,92 @@
-# CoolWalletS SeedBackupCard SampleCode
+# SeedBackupCard Sample Code
 
-> SeedBackupCard SampleCode for CoolWalletS
+> SeedBackupCard Sample Code for CoolWalletS
+
+# Setup
+Add the required dependencies in the module's ```build.gradle``` file
+```groovy
+dependencies{
+    implementation files('lib/bitcoinj-core-0.14.5.jar')
+    implementation files('lib/slf4j-api-1.7.12.jar')
+    implementation 'net.consensys.cava:cava:0.6.0'
+    implementation group: 'com.madgag.spongycastle', name: 'prov', version: '1.58.0.0'
+    implementation group: 'com.madgag.spongycastle', name: 'core', version: '1.58.0.0'
+}
+```
+
+# Commands & ResultCodes
+```java
+private interface Command {
+    String BACKUP = "80320500";
+    String GET_CARD_INFO = "80380000";
+    String GET_NEXT_PARTIAL_ENCRYPTED = "80C20000";
+    String RESET = "80360000";
+    String RESTORE = "80340000";
+    String SECURE_CHANNEL = "80CE000041";
+}
+
+public interface ResultCode {
+    String SUCCESS = "9000";
+    String RESET_FIRST = "6330";
+    String NO_DATA = "6370";
+    String PIN_CODE_NOT_MATCH = "6350";
+    String CARD_IS_LOCKED = "6390";
+}
+```
+For more details on **SecureChannel**, please check the [link](https://github.com/CoolBitX-Technology/seed-backup-card-android-sample/blob/master/SecureChannel.txt).
+
+# Use NFC in Android
+- [android.nfc.NfcAdapter](https://developer.android.com/reference/android/nfc/NfcAdapter)
+- [android.nfc.Tag](https://developer.android.com/reference/android/nfc/Tag)
+- [android.nfc.tech.IsoDep](https://developer.android.com/reference/android/nfc/tech/IsoDep) 
+
+
+# Work with Android NFC
+## 1. Request NFC access in the Android manifest
+Declare the following items in your app's ```AndroidManifest.xml``` file:
+
+- The permission to access the NFC hardware
+```xml
+<uses-permission android:name="android.permission.NFC" />
+``` 
+
+- The minimum SDK version that your application can support
+```xml
+<uses-sdk android:minSdkVersion="10"/>
+```
+
+- Optional: The ```uses-feature``` element so that the application shows up in Google Play only for devices have NFC hardware
+```xml
+<uses-feature android:name="android.hardware.nfc" android:required="true" />
+``` 
+
+## 1. Initial NFC
+1. Call initNFC function in ```onCreate()```.
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    initNFC();
+}
+
+private void initNFC() {
+    mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+}
 
 ```
-version:    1.0.0
-status:     release
-copyright:  coolbitX
-```
-
-## Setting in Android Studio
-
-1. Open Android Studio > Click Android Studio in header > preference > modify Android SDK Location( Your SDK path);
-
-2. Inspection depencies in build.gradel(app)
-
-    dependences{
-        implementation 'com.android.support:appcompat-v7:28.0.0'
-        implementation files('lib/bitcoinj-core-0.14.5.jar')
-         implementation 'com.google.guava:guava:27.0.1-android'
-         implementation files('lib/slf4j-api-1.7.12.jar')
-         implementation 'net.consensys.cava:cava:0.6.0'
-         implementation group: 'com.madgag.spongycastle', name: 'prov', version: '1.58.0.0'
-         implementation group: 'com.madgag.spongycastle', name: 'core', version: '1.58.0.0'
-    }
-
-## Example Usage
-
-### 0. APDU Command  & ErrorCode
-
-You can see SecureChannel Commentary  in SecureChannel.txt.
-
+2. OverWrite ```onPause```, ```OnNewIntent``` and ```onResume``` function
 ```JAVA
-  private interface Commands {
-      String BACKUP = "80320500";
-      String RESTORE = "80340000";
-      String RESET = "80360000";
-      String SECURE_CHANNEL = "80CE000041";
-  }
+@Override
+protected void onPause() {
+    super.onPause();
+    if (mNfcAdapter != null)
+        mNfcAdapter.disableForegroundDispatch(this);
+}
 
-  private interface ErrorCode {
-      String SUCCESS = "9000";
-      String RESET_FIRST = "6330";
-      String NO_DATA = "6370";
-      String PING_CODE_NOT_MATCH = "6350";
-      String CARD_IS_LOCKED = "6390";
-  }
-```
-
-### 1. NFC Librarys
-[android.nfc.NfcAdapter](https://developer.android.com/reference/android/nfc/NfcAdapter)
-[android.nfc.Tag](https://developer.android.com/reference/android/nfc/Tag)
-[android.nfc.tech.IsoDep](https://developer.android.com/reference/android/nfc/tech/IsoDep) 
-
-
-### 2. Initial NFC
-1.Need call initNFC function in onCreat().
-```JAVA
-
-      @Override
-      protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initNFC();
-      }
-      private void initNFC() {
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-      }
-
-```
-2.OverWrite onPause,OnNewIntent and onResume function
-```JAVA
-      @Override
-      protected void onPause() {
-        super.onPause();
-        if (mNfcAdapter != null)
-          mNfcAdapter.disableForegroundDispatch(this);
-      }
-
-      @Override
-      protected void onNewIntent(Intent intent) {
-          tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-          Log.d(TAG, "onNewIntent: " + intent.getAction());
-
-      }
+@Override
+protected void onNewIntent(Intent intent) {
+    tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+}
       
       @Override
       protected void onResume() {
@@ -97,7 +102,7 @@ You can see SecureChannel Commentary  in SecureChannel.txt.
       }
 ```
 
-### 3. BackUp Sample Code
+## 2. BackUp Sample Code
 
 
 ```JAVA
@@ -112,9 +117,7 @@ You can see SecureChannel Commentary  in SecureChannel.txt.
       }
 ```
 
-### 4. Restore Sample Code
-
-
+## 3. Restore Sample Code
 ```JAVA
       private void restore() {
         String apduHeader = Commands.RESTORE;
@@ -125,9 +128,7 @@ You can see SecureChannel Commentary  in SecureChannel.txt.
       }
 ```
 
-### 5. Reset Sample Code
-
-
+## 4. Reset Sample Code
 ```JAVA
   private void reset() {
       sendCmdWithSecureChannel(Commands.RESET, "");

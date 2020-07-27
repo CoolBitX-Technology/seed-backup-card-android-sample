@@ -95,6 +95,12 @@ public class CWSUtil {
         return sendCmdWithSecureChannel(apduHeader, command, tag);
     }
 
+    /**
+     * erase the content of the card
+     *
+     * @param tag nfc tag
+     * @return result code
+     */
     public static String reset(Tag tag) {
         return sendCmdWithSecureChannel(Command.RESET, "", tag);
     }
