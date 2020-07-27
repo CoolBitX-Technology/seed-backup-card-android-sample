@@ -4,7 +4,7 @@ Setup
 -----
 Add the required dependencies in the module's ```build.gradle``` file
 ```groovy
-dependencies{
+dependencies {
     implementation files('lib/bitcoinj-core-0.14.5.jar')
     implementation files('lib/slf4j-api-1.7.12.jar')
     implementation 'net.consensys.cava:cava:0.6.0'
