@@ -82,17 +82,15 @@ public class CWSUtil {
         String command;
         byte[] dataBytes = data.getBytes();
         String hexData = bytesToHex(dataBytes);
-        String HashPinCode = getSHA256StrJava(pinCode);
-        command = HashPinCode + hexData;
+        String hashedPinCode = getSHA256StrJava(pinCode);
+        command = hashedPinCode + hexData;
         return sendCmdWithSecureChannel(apduHeader, command, tag);
     }
 
     public static String restore(String pinCode, Tag tag) {
         String apduHeader = Command.RESTORE;
-        String command = "";
-        String HashPinCode = getSHA256StrJava(pinCode);
-        command = command + HashPinCode;
-        return sendCmdWithSecureChannel(apduHeader, command, tag);
+        String hashedPinCode = getSHA256StrJava(pinCode);
+        return sendCmdWithSecureChannel(apduHeader, hashedPinCode, tag);
     }
 
     /**

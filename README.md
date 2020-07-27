@@ -1,8 +1,7 @@
 # SeedBackupCard Sample Code
 
-> SeedBackupCard Sample Code for CoolWalletS
-
-# Setup
+Setup
+-----
 Add the required dependencies in the module's ```build.gradle``` file
 ```groovy
 dependencies{
@@ -14,7 +13,8 @@ dependencies{
 }
 ```
 
-# Commands & ResultCodes
+Commands & ResultCodes
+----------------------
 ```java
 private interface Command {
     String BACKUP = "80320500";
@@ -35,14 +35,16 @@ public interface ResultCode {
 ```
 For more details on **SecureChannel**, please check the [link](https://github.com/CoolBitX-Technology/seed-backup-card-android-sample/blob/master/SecureChannel.txt).
 
-# Use NFC in Android
+Use NFC in Android
+------------------
 - [android.nfc.NfcAdapter](https://developer.android.com/reference/android/nfc/NfcAdapter)
 - [android.nfc.Tag](https://developer.android.com/reference/android/nfc/Tag)
 - [android.nfc.tech.IsoDep](https://developer.android.com/reference/android/nfc/tech/IsoDep) 
 
 
-# Work with Android NFC
-## 1. Request NFC access in the Android manifest
+Work with Android NFC
+---------------------
+1. Request NFC access in the Android manifest
 Declare the following items in your app's ```AndroidManifest.xml``` file:
 
 - The permission to access the NFC hardware
@@ -60,77 +62,60 @@ Declare the following items in your app's ```AndroidManifest.xml``` file:
 <uses-feature android:name="android.hardware.nfc" android:required="true" />
 ``` 
 
-## 1. Initial NFC
-1. Call initNFC function in ```onCreate()```.
+2. Use NFC adapter
+- Initialize NFC adapter in ```onCreate()```.
 ```java
 @Override
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    initNFC();
-}
-
-private void initNFC() {
     mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 }
-
 ```
-2. OverWrite ```onPause```, ```OnNewIntent``` and ```onResume``` function
-```JAVA
-@Override
-protected void onPause() {
-    super.onPause();
-    if (mNfcAdapter != null)
-        mNfcAdapter.disableForegroundDispatch(this);
+- Use the foreground dispatch system
+The **foreground dispatch system** allows an activity to intercept an NFC intent (i.e. tag detected) 
+and claim priority over other activities that are registered to handle the same intent. 
+This way, when our application is in the foreground, 
+users won't be prompted to choose which application to open, and the intent is sent to our application.
+
+For more details on foreground dispatch system, please check the [link](https://developer.android.com/guide/topics/connectivity/nfc/advanced-nfc#foreground-dispatch).
+
+BackUp
+-----
+Store the given data and PIN in the card
+```java
+private String backup(String backupMessage, String pin) {
+    byte[] _data = backupMessage.getBytes();
+    String hexData = bytesToHex(_data);
+    String HashPinCode = getSHA256StrJava(pin);
+    String command = HashPinCode + hexData;
+    return sendCmdWithSecureChannel(Commands.BACKUP, command);
 }
+```
 
-@Override
-protected void onNewIntent(Intent intent) {
-    tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+Restore
+-------
+Get the contents of the card by specifying the **valid** PIN
+```java
+private String restore(String pin) {
+    String hashedPinCode = getSHA256StrJava(pin);
+    return sendCmdWithSecureChannel(Commands.RESTORE, hashedPinCode);
 }
-      
-      @Override
-      protected void onResume() {
-          super.onResume();
-          IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-          IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-          IntentFilter techDetected = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
-          IntentFilter[] nfcIntentFilter = new IntentFilter[]{techDetected, tagDetected, ndefDetected};
-
-          PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-          if (mNfcAdapter != null)
-            mNfcAdapter.enableForegroundDispatch(this, pendingIntent, nfcIntentFilter, null);     
-      }
 ```
 
-## 2. BackUp Sample Code
-
-
-```JAVA
-      private void backup() {
-          String apduHeader = Commands.BACKUP;  //max 255   05 tobyte
-          String command = "";
-          byte[] _data = "YouBackUpDataString".getBytes();
-          String hexData = bytesToHex(_data);
-          String HashPinCode = getSHA256StrJava("YouPingCodeString");
-          command = HashPinCode + hexData;
-          sendCmdWithSecureChannel(apduHeader, command);
-      }
+Reset
+-----
+Erase the contents of the card. (PIN will be retained)
+```java
+private String reset() {
+    return sendCmdWithSecureChannel(Commands.RESET, "");
+}
 ```
 
-## 3. Restore Sample Code
-```JAVA
-      private void restore() {
-        String apduHeader = Commands.RESTORE;
-        String command = "";
-        String HashPinCode =getSHA256StrJava("YouPingCodeString")
-        command = command + HashPinCode;
-        sendCmdWithSecureChannel(apduHeader, command);
-      }
-```
-
-## 4. Reset Sample Code
-```JAVA
-  private void reset() {
-      sendCmdWithSecureChannel(Commands.RESET, "");
-  }
+Get the information of the card
+-------------------------------
+Get the information of the card
+```java
+public static String getCardInfo() {
+    return sendCmdWithSecureChannel(Command.GET_CARD_INFO, "");
+}
 ```
