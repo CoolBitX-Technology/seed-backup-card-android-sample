@@ -83,7 +83,7 @@ For more details on foreground dispatch system, please check the [link](https://
 Usage
 -----
 
-### BackUp
+### Backup
 Store the given data and PIN in the card
 ```java
 public static String backup(String backupMessage, String pin) {
@@ -113,7 +113,7 @@ public static String reset() {
 ```
 
 ### Get the information of the card
-Get the information of the card
+Get the remaining tries and check if the card is being used
 ```java
 public static String getCardInfo() {
     return sendCmdWithSecureChannel(Command.GET_CARD_INFO, "");
