@@ -1,4 +1,6 @@
-package com.coolbitx.seedbackup.utils;
+package com.coolbitx.seedbackupcard_sdk;
+
+import org.bitcoinj.core.ECKey;
 
 import java.math.BigInteger;
 import java.security.AlgorithmParameters;
@@ -12,29 +14,24 @@ import java.security.spec.ECPublicKeySpec;
 
 import javax.crypto.KeyAgreement;
 
-import org.bitcoinj.core.ECKey;
+class KeyUtil {
 
-/**
- * @author liu
- */
-public class KeyUtil {
-
-    public static ECKey getECKey(String key) {
+    private static ECKey getECKey(String key) {
 
         return ECKey.fromPrivate(HexUtil.toByteArray(key));
     }
 
-    public static ECPoint getECPoint(String publicKey) {
+    private static ECPoint getECPoint(String publicKey) {
         return new ECPoint(
                 new BigInteger(publicKey.substring(2, 66), 16),
                 new BigInteger(publicKey.substring(66, 130), 16));
     }
 
-    public static String getPublicKey(String key) {
+    static String getPublicKey(String key) {
         return getPublicKey(getECKey(key));
     }
 
-    public static String getPublicKey(ECKey eckey) {
+    private static String getPublicKey(ECKey eckey) {
 
         if (null == eckey) {
             eckey = new ECKey();
@@ -42,16 +39,16 @@ public class KeyUtil {
         return getPublicKey(eckey.getPubKeyPoint());
     }
 
-    public static String getPublicKey(org.bouncycastle.math.ec.ECPoint ecPoint) {
+    private static String getPublicKey(org.bouncycastle.math.ec.ECPoint ecPoint) {
         return "04" + HexUtil.toHexString(ecPoint.getAffineXCoord().toBigInteger(), 32) + HexUtil.toHexString(ecPoint.getAffineYCoord().toBigInteger(), 32);
     }
 
-    public static String getPublicKey(org.spongycastle.math.ec.ECPoint ecPoint) {
+    private static String getPublicKey(org.spongycastle.math.ec.ECPoint ecPoint) {
         return "04" + HexUtil.toHexString(ecPoint.getAffineXCoord().toBigInteger(), 32) + HexUtil.toHexString(ecPoint.getAffineYCoord().toBigInteger(), 32);
     }
 
 
-    public static String getEcdhKey(String pubKey, String priKey) {
+    static String getEcdhKey(String pubKey, String priKey) {
         try {
             Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
             //Security.addProvider(new BouncyCastleProvider());
@@ -74,7 +71,7 @@ public class KeyUtil {
         }
     }
 
-    public static String getCompressedPublicKey(String publicKey) {
+    private static String getCompressedPublicKey(String publicKey) {
         String prefix = "04";
         int c = publicKey.charAt(129);
         if (c == '1' || c == '3' || c == '5' || c == '7' || c == '9' || c == 'B' || c == 'D' || c == 'F' || c == 'b' || c == 'd' || c == 'f') {
@@ -87,13 +84,13 @@ public class KeyUtil {
         return prefix + publicKey.substring(2, 66);
     }
 
-    public static String getChildChainCode(String parentPublicKey, String chainCode, String index) {
+    static String getChildChainCode(String parentPublicKey, String chainCode, String index) {
         String addend = HashUtil.HMAC2512(chainCode, getCompressedPublicKey(parentPublicKey) + index);
         System.out.println("HMAC: " + addend);
         return addend.substring(64, 128);
     }
 
-    public static String getChildPublicKey(String parentPublicKey, String chainCode, String index) {
+    static String getChildPublicKey(String parentPublicKey, String chainCode, String index) {
         org.bouncycastle.asn1.x9.X9ECParameters params = org.bouncycastle.asn1.x9.ECNamedCurveTable.getByName("secp256k1");
         org.bouncycastle.math.ec.ECCurve curve = params.getCurve();
 
@@ -106,6 +103,4 @@ public class KeyUtil {
         org.bouncycastle.math.ec.ECPoint R = P.add(Q).normalize();
         return getPublicKey(R);
     }
-
-
 }

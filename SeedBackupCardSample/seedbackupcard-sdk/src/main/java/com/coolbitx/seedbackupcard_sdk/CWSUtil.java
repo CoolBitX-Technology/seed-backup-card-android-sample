@@ -1,17 +1,16 @@
-package com.coolbitx.seedbackup.utils;
+package com.coolbitx.seedbackupcard_sdk;
 
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import static com.coolbitx.seedbackup.utils.HexUtil.bytesToHex;
-import static com.coolbitx.seedbackup.utils.HexUtil.hexStringToByteArray;
+import static com.coolbitx.seedbackupcard_sdk.HexUtil.byteArrToHexStr;
+import static com.coolbitx.seedbackupcard_sdk.HexUtil.hexStrToByteArr;
 
 public class CWSUtil {
     private static final String TAG = CWSUtil.class.getSimpleName();
@@ -21,7 +20,6 @@ public class CWSUtil {
     private static final String GenuineMasterPublicKey_NonInstalled = "04e720c727290f3cde711a82bba2f102322ab88029b0ff5be5171ad2d0a1a26efcd3502aa473cea30db7bc237021d00fd8929123246a993dc9e76ca7ef7f456ade";
     private static final String GenuineMasterChainCode_Test = "f5a0c5d9ffaee0230a98a1cc982117759c149a0c8af48635776135dae8f63ba4";
     private static final String GenuineMasterPublicKey_Test = "0401e3a7de779276ef24b9d5617ba86ba46dc5a010be0ce7aaf65876402f6a53a5cf1fecab85703df92e9c43e12a49f33370761153216df8291b7aa2f1a775b086";
-    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
     private static IsoDep techHandle = null;
 
@@ -42,35 +40,13 @@ public class CWSUtil {
         String CARD_IS_LOCKED = "6390";
     }
 
-    private static String byteArrayToHexStr(byte[] byteArray) {
-        if (byteArray == null) return null;
-
-        char[] hexChars = new char[byteArray.length * 2];
-        for (int j = 0; j < byteArray.length; j++) {
-            int v = byteArray[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-
-    private static String byteArrayToStr(byte[] byteArray) {
-        if (byteArray == null) return null;
-
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        for (int b : byteArray) {
-            if (b > 0) output.write(b);
-        }
-        return new String(output.toByteArray(), StandardCharsets.UTF_8);
-    }
-
-    public static String getSHA256StrJava(String str) {
+    private static String getSHA256StrJava(String str) {
 
         String encodeStr = "";
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(str.getBytes(StandardCharsets.UTF_8));
-            encodeStr = HexUtil.bytesToHex(hash);
+            encodeStr = byteArrToHexStr(hash);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -81,7 +57,7 @@ public class CWSUtil {
         String apduHeader = Command.BACKUP;  //max 255   05 tobyte
         String command;
         byte[] dataBytes = data.getBytes();
-        String hexData = bytesToHex(dataBytes);
+        String hexData = byteArrToHexStr(dataBytes);
         String hashedPinCode = getSHA256StrJava(pinCode);
         command = hashedPinCode + hexData;
         return sendCmdWithSecureChannel(apduHeader, command, tag);
@@ -114,14 +90,14 @@ public class CWSUtil {
             String sessionAppPublicKey = KeyUtil.getPublicKey(sessionAppPrivateKey);
             String command = Command.SECURE_CHANNEL;
             command = command + sessionAppPublicKey;
-            byte[] commandBytes = hexStringToByteArray(command);
+            byte[] commandBytes = hexStrToByteArr(command);
 
             techHandle = IsoDep.get(tag);
             if (techHandle.isConnected()) techHandle.close();
             techHandle.connect();
             byte[] resultBytes = techHandle.transceive(commandBytes);
 
-            String ret = byteArrayToHexStr(resultBytes);
+            String ret = byteArrToHexStr(resultBytes);
             if (ret.length() == 4) {
                 return ret;
             }
@@ -149,7 +125,7 @@ public class CWSUtil {
                     throw new Exception("Error");
             }
             //String cardName = new String(Hex.decode(cardNameHex));
-            String cardNameHash = HashUtil.SHA256(cardNameHex);
+            String cardNameHash = HashUtil.sha256(cardNameHex);
             String firstIndex = HexUtil.toHexString(HexUtil.toInt(cardNameHash.substring(0, 2)) & 0x7f, 1) + cardNameHash.substring(2, 8);
 
             String GenuineChild1PublicKey = KeyUtil.getChildPublicKey(GenuineMasterPublicKey, GenuineMasterChainCode, firstIndex);
@@ -172,7 +148,7 @@ public class CWSUtil {
                 byte[] resultByte = techHandle.transceive(bcmd);
                 apduResult[i] = HexUtil.toHexString(resultByte, resultByte.length);
 
-                String resultHexStr = byteArrayToHexStr(resultByte);
+                String resultHexStr = byteArrToHexStr(resultByte);
                 Log.i(TAG, "byteArrayToHexStr(resultByte):" + resultHexStr);
 
                 String postfix = apduResult[i].substring(apduResult[i].length() - 4);
@@ -203,7 +179,8 @@ public class CWSUtil {
                             }
                             Log.d(TAG, "concatEncrypted: " + concatEncrypted.toString());
                             data = getDecryptedData(concatEncrypted.toString());
-                            result.append(byteArrayToStr(hexStringToByteArray(data)));
+                            // convert hex to bytes to string
+                            result.append(new String(hexStrToByteArr(data), StandardCharsets.UTF_8));
                             break;
                         case Command.BACKUP:
                             if (i != blockNumber - 1) continue;
@@ -226,7 +203,8 @@ public class CWSUtil {
             // showResult("error:" + ex.toString());
         } finally {
             try {
-                techHandle.close();
+                if (techHandle != null)
+                    techHandle.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -247,7 +225,7 @@ public class CWSUtil {
         '+' means concatenate
         */
         String salt = CommonUtil.hexRandom(4);
-        String hash = HashUtil.SHA256(apduHeader + salt + apduData);
+        String hash = HashUtil.sha256(apduHeader + salt + apduData);
         String cipherData = "00" + CryptoUtil.encryptAES(secureKey, apduHeader + hash + salt + apduData);
         System.out.println("secureKey:" + secureKey + " (" + (secureKey.length() / 2) + "Bytes)");
         System.out.println("securePln:" + apduHeader + " " + apduData + " (" + (apduData.length() / 2) + "Bytes) +" + salt + "," + hash);
