@@ -9,11 +9,10 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-
 public class CryptoUtil {
     private static final String TAG = CryptoUtil.class.getSimpleName();
 
-    public static String encryptAES(String key, String plain) {
+    static String encryptAES(String key, String plain) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             byte[] iv = ByteBuffer.allocate(16).putInt(0).array();
@@ -29,7 +28,7 @@ public class CryptoUtil {
         }
     }
 
-    public static String decryptAES(String key, String plain) {
+    static String decryptAES(String key, String plain) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             byte[] iv = ByteBuffer.allocate(16).putInt(0).array();

@@ -2,15 +2,12 @@ package com.coolbitx.seedbackup.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import org.spongycastle.util.encoders.Hex;
 
-
-/**
- * @author liu
- */
 public class HashUtil {
 
-    public static String SHA256(String data) {
+    static String sha256(String data) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             digest.update(Hex.decode(data));
@@ -18,13 +15,13 @@ public class HashUtil {
 
             return HexUtil.toHexString(messageDigest, 32);
         } catch (NoSuchAlgorithmException e) {
-            System.out.println(e.getClass().getSimpleName() + e.toString());
+            e.printStackTrace();
         }
         // assertTrue("SHA Error",false);
         return null;
     }
 
-    public static String HMAC2512(String key, String data) {
+    static String HMAC2512(String key, String data) {
         try {
             byte[] ret = new byte[64];
             HMAC(Hex.decode(key), 0, key.length() / 2, Hex.decode(data), 0, data.length() / 2, ret, 0, MessageDigest.getInstance("SHA-512"));
