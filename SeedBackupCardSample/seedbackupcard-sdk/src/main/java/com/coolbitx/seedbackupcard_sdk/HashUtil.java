@@ -1,9 +1,9 @@
-package com.coolbitx.seedbackup.utils;
+package com.coolbitx.seedbackupcard_sdk;
+
+import org.spongycastle.util.encoders.Hex;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import org.spongycastle.util.encoders.Hex;
 
 class HashUtil {
 

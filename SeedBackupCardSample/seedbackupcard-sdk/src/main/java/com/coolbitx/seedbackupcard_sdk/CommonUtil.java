@@ -1,5 +1,5 @@
 
-package com.coolbitx.seedbackup.utils;
+package com.coolbitx.seedbackupcard_sdk;
 
 import java.util.Random;
 

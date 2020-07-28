@@ -14,7 +14,7 @@ import android.widget.ArrayAdapter;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.coolbitx.seedbackup.databinding.ActivityMainBinding;
-import com.coolbitx.seedbackup.utils.CWSUtil;
+import com.coolbitx.seedbackupcard_sdk.CWSUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -167,9 +167,9 @@ public class MainActivity extends AppCompatActivity {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         IntentFilter tag = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-//        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-//        IntentFilter tech = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
-        intentFilters = new IntentFilter[]{tag};
+        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        IntentFilter tech = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
+        intentFilters = new IntentFilter[]{tag, ndef, tech};
     }
 
     private void showResult(String msg) {

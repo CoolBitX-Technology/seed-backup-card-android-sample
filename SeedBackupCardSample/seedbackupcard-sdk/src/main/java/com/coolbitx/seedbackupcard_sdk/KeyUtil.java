@@ -1,4 +1,6 @@
-package com.coolbitx.seedbackup.utils;
+package com.coolbitx.seedbackupcard_sdk;
+
+import org.bitcoinj.core.ECKey;
 
 import java.math.BigInteger;
 import java.security.AlgorithmParameters;
@@ -11,8 +13,6 @@ import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
 
 import javax.crypto.KeyAgreement;
-
-import org.bitcoinj.core.ECKey;
 
 class KeyUtil {
 

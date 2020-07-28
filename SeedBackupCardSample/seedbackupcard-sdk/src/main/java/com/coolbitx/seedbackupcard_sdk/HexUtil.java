@@ -1,9 +1,9 @@
 
-package com.coolbitx.seedbackup.utils;
-
-import java.math.BigInteger;
+package com.coolbitx.seedbackupcard_sdk;
 
 import org.spongycastle.util.encoders.Hex;
+
+import java.math.BigInteger;
 
 class HexUtil {
 

@@ -1,4 +1,4 @@
-package com.coolbitx.seedbackup.utils;
+package com.coolbitx.seedbackupcard_sdk;
 
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
@@ -9,8 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import static com.coolbitx.seedbackup.utils.HexUtil.byteArrToHexStr;
-import static com.coolbitx.seedbackup.utils.HexUtil.hexStrToByteArr;
+import static com.coolbitx.seedbackupcard_sdk.HexUtil.byteArrToHexStr;
+import static com.coolbitx.seedbackupcard_sdk.HexUtil.hexStrToByteArr;
 
 public class CWSUtil {
     private static final String TAG = CWSUtil.class.getSimpleName();
@@ -46,7 +46,7 @@ public class CWSUtil {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(str.getBytes(StandardCharsets.UTF_8));
-            encodeStr = HexUtil.byteArrToHexStr(hash);
+            encodeStr = byteArrToHexStr(hash);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
