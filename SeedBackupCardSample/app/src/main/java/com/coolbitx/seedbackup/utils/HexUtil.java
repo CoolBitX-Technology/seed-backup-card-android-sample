@@ -5,7 +5,7 @@ import java.math.BigInteger;
 
 import org.spongycastle.util.encoders.Hex;
 
-public class HexUtil {
+class HexUtil {
 
     private final static char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 

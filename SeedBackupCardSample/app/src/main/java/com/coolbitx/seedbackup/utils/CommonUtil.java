@@ -3,7 +3,7 @@ package com.coolbitx.seedbackup.utils;
 
 import java.util.Random;
 
-public class CommonUtil {
+class CommonUtil {
     static String hexRandom(int byteLength) {
         Random ran = new Random();
         byte[] temp = new byte[byteLength];

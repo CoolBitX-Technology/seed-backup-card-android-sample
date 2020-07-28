@@ -14,7 +14,7 @@ import javax.crypto.KeyAgreement;
 
 import org.bitcoinj.core.ECKey;
 
-public class KeyUtil {
+class KeyUtil {
 
     private static ECKey getECKey(String key) {
 

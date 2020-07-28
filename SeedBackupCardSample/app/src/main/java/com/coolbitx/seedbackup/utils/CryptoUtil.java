@@ -9,7 +9,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class CryptoUtil {
+class CryptoUtil {
     private static final String TAG = CryptoUtil.class.getSimpleName();
 
     static String encryptAES(String key, String plain) {

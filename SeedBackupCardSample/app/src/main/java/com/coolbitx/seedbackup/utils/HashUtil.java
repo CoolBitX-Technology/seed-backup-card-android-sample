@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 
 import org.spongycastle.util.encoders.Hex;
 
-public class HashUtil {
+class HashUtil {
 
     static String sha256(String data) {
         try {
