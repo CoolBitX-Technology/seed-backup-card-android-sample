@@ -2,6 +2,10 @@
 
 Follow the instructions to build **seed-backup-card-sdk**. 
 
+Min SDK Version
+---------------
+seed-backup-card-sdk supports android api level 24 and above
+
 Setup
 -----
 Add the required dependencies in the module's ```build.gradle``` file
