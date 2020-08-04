@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.coolbitx.seedbackup.databinding.ActivityMainBinding;
 import com.coolbitx.seedbackup.utils.CWSUtil;
+import com.coolbitx.seedbackup.utils.HexUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -200,15 +201,22 @@ public class MainActivity extends AppCompatActivity {
                 break;
             default:
                 if (currentMode == Mode.CHECK) {
-                    int remaining = Integer.parseInt(msg.substring(0, 2));
-                    if (remaining == 0) {
-                        result.append("The card is locked.");
+                    if (msg.length() != 8) {
+                        result.append(msg);
                     } else {
-                        result.append("Attempts remaining: ");
-                        result.append(remaining);
+                        int remaining = Integer.parseInt(msg.substring(0, 2));
+                        if (remaining == 0) {
+                            result.append("The card is locked.");
+                        } else {
+                            result.append("Attempts remaining: ");
+                            result.append(remaining);
+                        }
+                        result.append("\nIs empty card: ");
+                        result.append(msg.substring(2, 4).equals("01") ? "false" : "true");
+
+                        result.append("\nSE version: ");
+                        result.append(HexUtil.toInt(msg.substring(4)));
                     }
-                    result.append("\nThe card is ");
-                    result.append(msg.substring(2).equals("01") ? "not empty." : "empty.");
                 } else
                     result.append(msg);
         }
