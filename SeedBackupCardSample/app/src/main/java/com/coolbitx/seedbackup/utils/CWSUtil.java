@@ -222,8 +222,6 @@ public class CWSUtil {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            Log.e(TAG, "error: " + ex.toString());
-            // showResult("error:" + ex.toString());
             return null;
         } finally {
             try {
