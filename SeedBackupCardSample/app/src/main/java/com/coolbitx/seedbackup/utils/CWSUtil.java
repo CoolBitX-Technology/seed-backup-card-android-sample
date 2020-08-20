@@ -224,14 +224,15 @@ public class CWSUtil {
             ex.printStackTrace();
             Log.e(TAG, "error: " + ex.toString());
             // showResult("error:" + ex.toString());
+            return null;
         } finally {
             try {
-                techHandle.close();
+                if (techHandle != null)
+                    techHandle.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return null;
     }
 
     private static String[] sendSecureInner(String apduHeader, String apduData) {

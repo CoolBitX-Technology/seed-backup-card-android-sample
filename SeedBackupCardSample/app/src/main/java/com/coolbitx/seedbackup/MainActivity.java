@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -168,14 +169,17 @@ public class MainActivity extends AppCompatActivity {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         IntentFilter tag = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-//        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-//        IntentFilter tech = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
-        intentFilters = new IntentFilter[]{tag};
+        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        IntentFilter tech = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
+        intentFilters = new IntentFilter[]{tag, ndef, tech};
     }
 
     private void showResult(String msg) {
         StringBuilder result = new StringBuilder();
-        if (msg == null) return;
+        if (msg == null) {
+            Toast.makeText(MainActivity.this, "No card is detected", Toast.LENGTH_SHORT).show();
+            return;
+        }
         switch (msg) {
             case CWSUtil.ResultCode.SUCCESS:
                 if (currentMode == Mode.BACKUP) {
