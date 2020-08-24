@@ -4,13 +4,13 @@ import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
-import static com.coolbitx.seedbackup.utils.HexUtil.bytesToHex;
+import static com.coolbitx.seedbackup.utils.HexUtil.byteArrayToHexStr;
 import static com.coolbitx.seedbackup.utils.HexUtil.hexStringToByteArray;
 
 public class CWSUtil {
@@ -42,35 +42,13 @@ public class CWSUtil {
         String CARD_IS_LOCKED = "6390";
     }
 
-    private static String byteArrayToHexStr(byte[] byteArray) {
-        if (byteArray == null) return null;
-
-        char[] hexChars = new char[byteArray.length * 2];
-        for (int j = 0; j < byteArray.length; j++) {
-            int v = byteArray[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-
-    private static String byteArrayToStr(byte[] byteArray) {
-        if (byteArray == null) return null;
-
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        for (int b : byteArray) {
-            if (b > 0) output.write(b);
-        }
-        return new String(output.toByteArray(), StandardCharsets.UTF_8);
-    }
-
     public static String getSHA256StrJava(String str) {
 
         String encodeStr = "";
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(str.getBytes(StandardCharsets.UTF_8));
-            encodeStr = HexUtil.bytesToHex(hash);
+            encodeStr = byteArrayToHexStr(hash);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -81,7 +59,9 @@ public class CWSUtil {
         String apduHeader = Command.BACKUP;  //max 255   05 tobyte
         String command;
         byte[] dataBytes = data.getBytes();
-        String hexData = bytesToHex(dataBytes);
+        Log.d(TAG, "raw byte array: " + Arrays.toString(dataBytes));
+        String hexData = byteArrayToHexStr(dataBytes);
+        Log.d(TAG, "raw hex data: " + hexData);
         String hashedPinCode = getSHA256StrJava(pinCode);
         command = hashedPinCode + hexData;
         return sendCmdWithSecureChannel(apduHeader, command, tag);
@@ -203,7 +183,7 @@ public class CWSUtil {
                             }
                             Log.d(TAG, "concatEncrypted: " + concatEncrypted.toString());
                             data = getDecryptedData(concatEncrypted.toString());
-                            result.append(byteArrayToStr(hexStringToByteArray(data)));
+                            result.append(new String(hexStringToByteArray(data), StandardCharsets.UTF_8));
                             break;
                         case Command.BACKUP:
                             if (i != blockNumber - 1) continue;

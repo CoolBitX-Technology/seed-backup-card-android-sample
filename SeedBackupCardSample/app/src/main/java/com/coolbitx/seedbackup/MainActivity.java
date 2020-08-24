@@ -57,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
         String[] dummyStrList = new String[]{
                 getString(R.string.dummy_backup_msg),
                 getString(R.string.dummy_backup_msg_long),
-                getString(R.string.dummy_backup_msg_extremely_long),};
+                getString(R.string.dummy_backup_msg_extremely_long),
+                getString(R.string.dummy_backup_msg_non_alphanumeric)};
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_text, dummyStrList);
         binding.textBackup.setAdapter(adapter);
 

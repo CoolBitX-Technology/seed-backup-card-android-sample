@@ -48,6 +48,9 @@
         sources of capital. They tend to move in the same direction, and in the short run they tend
         to go down.
     </string>
+    <!-- input field placeholder backup message non-alphanumeric version -->
+    <string name="dummy_backup_msg_non_alphanumeric">哈囉，世界！</string>
+
     <!-- input field placeholder PIN -->
     <string name="dummy_pin">0000</string>
 </resources>
