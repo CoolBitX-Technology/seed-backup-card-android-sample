@@ -49,7 +49,15 @@
         to go down.
     </string>
     <!-- input field placeholder backup message non-alphanumeric version -->
-    <string name="dummy_backup_msg_non_alphanumeric">哈囉，世界！</string>
+    <string name="dummy_backup_msg_non_alphanumeric">
+        zh: 你好，世界！\n
+        ja: こんにちは世界！\n
+        ko: 안녕하세요!\n
+        fr: Bonjour le monde!\n
+        ru: Привет мир!\n
+        el: Γειά σου Κόσμε!\n
+        th: สวัสดีชาวโลก!\n
+    </string>
 
     <!-- input field placeholder PIN -->
     <string name="dummy_pin">0000</string>
